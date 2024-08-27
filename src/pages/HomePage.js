@@ -23,9 +23,9 @@ const HomePage = () => {
         <JournalPage title="Home" nextPage="/about" isCover={true}>
             <StyledHomePage>
                 <Typography variant="h3" sx={{
-                    
-                    fontSize: '4rem',
-                    letterSpacing: 1,
+                    width: '80%',
+                    fontSize: '5rem',
+                    letterSpacing: 1.5,
                     color: 'black', // Ensuring text is black
                     textShadow: '2px 1px 1px rgba(255,255,255,0.6)', // Adding a subtle white shadow for a glowing effect
                     fontFamily: 'Permanent Marker' // Use a "handwritten" style font
@@ -34,6 +34,7 @@ const HomePage = () => {
                 </Typography>
                 <Typography variant="h5" sx={{
                     marginBottom: 3,
+                    fontSize: '3rem',
                     color: 'black',
                     fontFamily: 'Permanent Marker'
                 }}>
