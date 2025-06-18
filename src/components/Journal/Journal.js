@@ -40,7 +40,7 @@ const StyledJournalContainer = styled(Box, {
   // --- Mobile Styles ---
   '@media (max-width: 768px)': {
     width: '100vw',
-    height: `calc(80vh * (4.55 / 5))`,
+    height: `calc(80vh * (4.7 / 5))`,
     margin: '2.5vh auto', 
   },
 }));

@@ -1,117 +1,68 @@
-// Journal.js
+// JournalBookmark.js
 
-import React, { useMemo } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import HomePage from '../../pages/HomePage';
-import AboutPage from '../../pages/AboutPage';
-import ProjectsPage from '../../pages/ProjectsPage';
-import ResumePage from '../../pages/ResumePage';
-import TableOfContentsPage from '../../pages/TableOfContentsPage'; // Import the new page
-import { styled } from '@mui/system';
-import Box from '@mui/material/Box';
-import backgroundImage from '../../assets/images/journalBackgroundCover.jpg';
-import JournalBookmark from '../JournalBookmark/JournalBookmark';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import bookmarkImage from '../../assets/images/Bookmark.png';
 
-const theme = createTheme({
-  typography: {
-    fontFamily: '"Cinzel", serif',
-  },
-  palette: {
-    primary: {
-      main: '#333',
-    },
-    secondary: {
-      main: '#ebd469',
-    },
-  },
-});
-
-const StyledJournalContainer = styled(Box, {
-  name: 'JournalContainer',
-})(({ theme, isHomePage }) => ({
-  backgroundImage: isHomePage ? `url(${backgroundImage})` : 'none',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-  height: '90vh', 
-  width: `calc(80vh * (4 / 5))`,
-  margin: '0 auto',
-  borderRadius: '12px',
-  boxShadow:
-    'inset 0 0 10px rgba(0, 0, 0, 0.5), 10px 10px 30px rgba(0, 0, 0, 0.5)',
-  position: 'relative',
+const BookmarkContainer = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  right: '-4%',
+  top: theme.spacing(4),
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 0,
+  alignItems: 'left',
+  justifyContent: 'left',
+  zIndex: 1,
 }));
 
+const StyledBookmark = styled('div')(({ theme, color }) => ({
+  backgroundImage: `url(${bookmarkImage})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'left',
+  backgroundRepeat: 'no-repeat',
+  padding: theme.spacing(0.5),
+  display: 'flex',
+  justifyContent: 'center',
+  width: `calc(100% + 10vh)`,
+  margin: theme.spacing(1),
+  position: 'relative', 
+  transition: 'transform 0.1s ease-in-out', 
+  '&:hover': {
 
-const Journal = () => {
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
+    transform: 'translateX(5%)',
+    zIndex: 3, 
+  },
+}));
 
-  const pages = useMemo(() => {
-    const pageList = [
-      { path: '/', component: HomePage, title: 'Home', isBookmark: true },
-      {
-        path: '/table-of-contents',
-        component: TableOfContentsPage,
-        title: 'Table of Contents',
-        isBookmark: false, 
-      },
-      { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
-      {
-        path: '/projects',
-        component: ProjectsPage,
-        title: 'Projects',
-        isBookmark: true,
-      },
-      { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
-    ];
-
-    let pageNumberCounter = 1;
-    const pagesWithNumbers = pageList.map((page, index) => {
-      if (index >= 2) {
-        return { ...page, pageNumber: pageNumberCounter++ };
-      } else {
-        return { ...page, pageNumber: null };
-      }
-    });
-    return pagesWithNumbers;
-  }, []);
-
+const JournalBookmark = ({ pages }) => {
+  const bookmarkedPages = pages.filter((page) => page.isBookmark);
   return (
-    <ThemeProvider theme={theme}>
-      <StyledJournalContainer isHomePage={isHomePage} className="journal-container">
-        <JournalBookmark pages={pages} />
-        <Routes>
-          {pages.map((page, index) => {
-            const nextPage = pages[(index + 1) % pages.length].path;
-            const prevPage = pages[(index - 1 + pages.length) % pages.length].path;
-
-            return (
-              <Route
-                key={page.path}
-                path={page.path}
-                element={
-                  <page.component
-                    nextPage={nextPage}
-                    prevPage={prevPage}
-                    pageNumber={page.pageNumber}
-                    isBookmark={page.isBookmark}
-                    pages={page.path === '/table-of-contents' ? pages : undefined}
-                  />
-                }
-              />
-            );
-          })}
-        </Routes>
-      </StyledJournalContainer>
-    </ThemeProvider>
+    <BookmarkContainer>
+      {bookmarkedPages.map((page, index) => (
+        <Link
+          key={index}
+          to={page.path}
+          style={{ textDecoration: 'none' }}
+          onClick={() => console.log(`Navigating to ${page.title}: ${page.path}`)}
+        >
+          <StyledBookmark aria-label={page.title}>
+            <Typography
+              variant="body2"
+              style={{
+                color: '#ebd469',
+                fontWeight: 'bold',
+                fontFamily: '"Permanent Marker", cursive',
+              }}
+            >
+              {page.title}
+            </Typography>
+          </StyledBookmark>
+        </Link>
+      ))}
+    </BookmarkContainer>
   );
 };
 
-export default Journal;
+export default JournalBookmark;

@@ -7,7 +7,7 @@ import aboutPic from '../assets/images/aboutPic.jpg';
 
 const PolaroidImage = styled('img')(({ theme }) => ({
     position: 'absolute',
-    bottom: theme.spacing(18),
+    bottom: theme.spacing(16),
     left: '50%',
     transform: 'translateX(-50%)',
     maxWidth: '50%',

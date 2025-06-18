@@ -68,11 +68,12 @@ const ArrowButton = styled(IconButton, {
   // Mobile styles
   '@media (max-width: 768px)': {
     backgroundColor: 'none',
-    color: 'black',
+    color: 'white',
     zIndex: 5,
     right: direction === 'forward' ? theme.spacing(2) : undefined,
     left: direction === 'back' ? theme.spacing(2) : undefined,
-    bottom: theme.spacing(),
+    
+    bottom: theme.spacing(-8),
     '& svg': {
         fontSize: '3rem', 
     },

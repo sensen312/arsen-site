@@ -30,6 +30,7 @@ const UnderlineText = styled('span')({
 
 const DownloadButton = styled(Button)({
   backgroundColor: '#d3c6b2',
+  fontSize: '150%',
   color: 'black',
   '&:hover': {
       backgroundColor: '#b8a08d',
