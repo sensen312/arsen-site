@@ -88,6 +88,7 @@ const PageNumber = styled(Typography, {
   bottom: theme.spacing(0.9),
   color: theme.palette.primary.main,
   fontSize: '2rem',
+  zIndex: 5,
 }));
 
 const JournalPage = ({
