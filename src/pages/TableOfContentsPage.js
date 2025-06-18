@@ -10,7 +10,7 @@ const ClickableLineItem = styled(Link)(({ theme }) => ({
   alignItems: 'baseline',
   padding: theme.spacing(0, 4),
   fontFamily: '"Cinzel", serif',
-
+  marginTop: "1px",
   lineHeight: '24px',
   fontSize: '23px',
   overflow: 'hidden',
@@ -50,10 +50,12 @@ const TableOfContentsPage = ({ pages, nextPage, prevPage, pageNumber, isBookmark
       pageNumber={pageNumber}
       isBookmark={isBookmark}
     >
+      <br />
       <ContentContainer>
         {pages
           .filter((page) => page.pageNumber != null)
           .map((page, index) => (
+            
             <ClickableLineItem key={index} to={page.path}>
               <TitleSpan>{page.title}</TitleSpan>
               <Leader>

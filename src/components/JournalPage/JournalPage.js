@@ -3,6 +3,7 @@ import { Paper, Typography, IconButton } from '@mui/material';
 import { ArrowForward, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/system';
+import zIndex from '@mui/material/styles/zIndex';
 
 const StyledJournalPage = styled(Paper, {
   name: 'JournalPage',
@@ -15,10 +16,8 @@ const StyledJournalPage = styled(Paper, {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: isCover ? 'center' : 'flex-start',
-  width: '90%',
-  paddingLeft: '5%',
-  paddingRight: '4%',
-  paddingBottom: theme.spacing(6),
+  width: '100%',
+ 
   zIndex: 2, 
 }));
 
@@ -49,18 +48,34 @@ const ArrowButton = styled(IconButton, {
   name: 'ArrowButton',
 })(({ theme, direction }) => ({
   position: 'absolute',
-  right: direction === 'forward' ? theme.spacing(-10) : undefined,
-  left: direction === 'back' ? theme.spacing(-10) : undefined,
   bottom: theme.spacing(2),
   backgroundColor: 'none',
   color: 'white',
   boxShadow: '2px 2px 0px 1px rgba(0, 0, 0, 0.1)',
+  
+  // Desktop styles
+  right: direction === 'forward' ? theme.spacing(-10) : undefined,
+  left: direction === 'back' ? theme.spacing(-10) : undefined,
+
   '&:hover': {
     backgroundColor: '#e0d7c9',
     boxShadow: '2px 2px 0px 1px rgba(0, 0, 0, 0.2)',
   },
   '& svg': {
     fontSize: '3.5rem',
+  },
+
+  // Mobile styles
+  '@media (max-width: 768px)': {
+    backgroundColor: 'none',
+    color: 'black',
+    zIndex: 5,
+    right: direction === 'forward' ? theme.spacing(2) : undefined,
+    left: direction === 'back' ? theme.spacing(2) : undefined,
+    bottom: theme.spacing(),
+    '& svg': {
+        fontSize: '3rem', 
+    },
   },
 }));
 

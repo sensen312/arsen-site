@@ -1,15 +1,12 @@
-// Journal.js
-
 import React, { useMemo } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import HomePage from '../../pages/HomePage';
 import AboutPage from '../../pages/AboutPage';
 import ProjectsPage from '../../pages/ProjectsPage';
 import ResumePage from '../../pages/ResumePage';
-import TableOfContentsPage from '../../pages/TableOfContentsPage'; // Import the new page
+import TableOfContentsPage from '../../pages/TableOfContentsPage';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
-import backgroundImage from '../../assets/images/journalBackgroundCover.jpg';
 import JournalBookmark from '../JournalBookmark/JournalBookmark';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -29,29 +26,28 @@ const theme = createTheme({
 
 const StyledJournalContainer = styled(Box, {
   name: 'JournalContainer',
-})(({ theme, isHomePage }) => ({
-  backgroundImage: isHomePage ? `url(${backgroundImage})` : 'none',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
+})(({ theme }) => ({
+  // --- This is now a pure structural container ---
   height: '90vh', 
   width: `calc(80vh * (4 / 5))`,
   margin: '0 auto',
-  borderRadius: '12px',
-  boxShadow:
-    'inset 0 0 10px rgba(0, 0, 0, 0.5), 10px 10px 30px rgba(0, 0, 0, 0.5)',
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  zIndex: 0,
+
+  // --- Mobile Styles ---
+  '@media (max-width: 768px)': {
+    width: '100vw',
+    height: `calc(80vh * (4.55 / 5))`,
+    margin: '2.5vh auto', 
+  },
 }));
 
 
 const Journal = () => {
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
 
   const pages = useMemo(() => {
     const pageList = [
@@ -85,7 +81,7 @@ const Journal = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <StyledJournalContainer isHomePage={isHomePage} className="journal-container">
+      <StyledJournalContainer>
         <JournalBookmark pages={pages} />
         <Routes>
           {pages.map((page, index) => {
