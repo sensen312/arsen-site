@@ -8,7 +8,7 @@ import bookmarkImage from '../../assets/images/Bookmark.png';
 
 const BookmarkContainer = styled('div')(({ theme }) => ({
   position: 'absolute',
-  right: 'calc(2vw - 5vh)',
+  right: '-4%',
   top: theme.spacing(4),
   display: 'flex',
   flexDirection: 'column',
@@ -27,9 +27,12 @@ const StyledBookmark = styled('div')(({ theme, color }) => ({
   justifyContent: 'center',
   width: `calc(100% + 10vh)`,
   margin: theme.spacing(1),
-  zIndex: 2,
+  position: 'relative', 
+  transition: 'transform 0.1s ease-in-out', 
   '&:hover': {
-    transform: 'translateX(10px)',
+
+    transform: 'translateX(5%)',
+    zIndex: 3, 
   },
 }));
 

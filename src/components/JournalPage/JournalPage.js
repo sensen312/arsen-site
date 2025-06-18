@@ -19,15 +19,15 @@ const StyledJournalPage = styled(Paper, {
   paddingLeft: '5%',
   paddingRight: '4%',
   paddingBottom: theme.spacing(6),
+  zIndex: 2, 
 }));
+
 
 const StyledTypography = styled(Typography, {
   name: 'JournalPageTitle',
 })(({ theme }) => ({
   borderBottom: '1px solid #bbb',
-  paddingBottom: theme.spacing(1),
-  marginBottom: theme.spacing(1),
-  fontSize: `calc(1.5rem + 1vh)`,
+
   color: theme.palette.primary.main,
   textAlign: 'center',
 }));
@@ -36,14 +36,13 @@ const ContentArea = styled('div', {
   name: 'JournalContentArea',
 })(({ theme, isCover }) => ({
   flexGrow: 1,
-  overflowY: isCover ? 'hidden' : 'auto',
+  overflowY: 'hidden', 
   background: isCover
     ? 'none'
     : 'repeating-linear-gradient(#f8f0e3, #f8f0e3 23px, #000 24px)',
   width: '100%',
   color: theme.palette.primary.main,
-  lineHeight: '24px',
-  fontSize: `calc(1.3rem + 0.3vw)`,
+  zIndex: 2,
 }));
 
 const ArrowButton = styled(IconButton, {

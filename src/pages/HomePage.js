@@ -14,6 +14,7 @@ const StyledHomePage = styled('div')(({ theme }) => ({
     height: '100%',
     width: '100%',
     color: '#000000',
+    zIndex: 3,
 }));
 
 // Title

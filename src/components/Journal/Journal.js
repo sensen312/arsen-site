@@ -34,10 +34,9 @@ const StyledJournalContainer = styled(Box, {
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
-  height: '90vh',
-  maxHeight: '90vh',
+  height: '90vh', 
   width: `calc(80vh * (4 / 5))`,
-  margin: '3vh auto',
+  margin: '0 auto',
   borderRadius: '12px',
   boxShadow:
     'inset 0 0 10px rgba(0, 0, 0, 0.5), 10px 10px 30px rgba(0, 0, 0, 0.5)',
@@ -46,7 +45,9 @@ const StyledJournalContainer = styled(Box, {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  zIndex: 0,
 }));
+
 
 const Journal = () => {
   const location = useLocation();
@@ -59,7 +60,7 @@ const Journal = () => {
         path: '/table-of-contents',
         component: TableOfContentsPage,
         title: 'Table of Contents',
-        isBookmark: false, // leave for now
+        isBookmark: false, 
       },
       { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
       {
@@ -71,7 +72,6 @@ const Journal = () => {
       { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
     ];
 
-    // Assign page numbers starting from 1 after Table of Contents
     let pageNumberCounter = 1;
     const pagesWithNumbers = pageList.map((page, index) => {
       if (index >= 2) {
