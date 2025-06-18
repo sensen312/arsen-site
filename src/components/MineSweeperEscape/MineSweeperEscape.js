@@ -67,7 +67,10 @@ const GridCell = styled('div')({
     color: '#333',
     fontSize: '20px',
     textAlign: 'center',
+    cursor: 'pointer', 
+    touchAction: 'manipulation' ,
 });
+
 
 
 const StyledGameInfoRow = styled('div')(({ theme }) => ({
@@ -180,6 +183,10 @@ const MineSweeperEscape = () => {
         localStorage.setItem('scores', JSON.stringify(savedScores));
     };
 
+    const [explode, setExplode] = useState(false);
+    const [showBomb, setShowBomb] = useState(false);
+
+
     const movePlayer = (direction) => {
         let newX = playerPosition.x;
         let newY = playerPosition.y;
@@ -204,57 +211,92 @@ const MineSweeperEscape = () => {
         const newPosition = { x: newX, y: newY };
 
         // Check for mine collision
-        const mineCollision = mines.some(
+        const mineIndex = mines.findIndex(
             (mine) => mine.x === newPosition.x && mine.y === newPosition.y
         );
+    
+        if (mineIndex !== -1) {
+            // Initiating explodeing animation
+            setShowBomb(true);
+            setMines(mines => mines.filter((_, index) => index !== mineIndex));
 
-        if (mineCollision) {
+            setTimeout(() => {
+                setExplode(true);
+                setTimeout(() => setExplode(false), 100); // Explode for 300ms
+
+                setShowBomb(false); // Hide bomb emoji after starting the explosion
+
+                // Remove the exploded mine from the mines array
+            }, 200); 
+            
             setLives((prevLives) => {
                 const updatedLives = prevLives - 1;
                 if (updatedLives <= 0) {
                     setGameState('gameOver');
-                    // Save score and display game over screen
                 }
                 return updatedLives;
             });
         }
+        
+        // Update the player position if there is no collision
+        setPlayerPosition(newPosition);
 
         // Check for exit collision
         if (newPosition.x === exitPosition.x && newPosition.y === exitPosition.y) {
-            setGameState('gameOver');
-            // Save score and display victory screen
+            setGameState('gameOver'); // Set game over state on reaching the exit
+            saveScore(timer); // Save the score as the player wins
         }
-
-        // Update the player position if there is no collision
-        setPlayerPosition(newPosition);
+        
     };
+
+    
+    
 
 
     if (gameState === 'gameOver') {
         saveScore(timer);
     }
 
+    const handleCellClick = (x, y) => {
+        if (gameState !== 'playing') return;
+    
+        const diffX = x - playerPosition.x;
+        const diffY = y - playerPosition.y;
+    
+        if (Math.abs(diffX) + Math.abs(diffY) === 1) { // Ensure that it's an adjacent cell
+            if (diffX === 1) movePlayer('right');
+            if (diffX === -1) movePlayer('left');
+            if (diffY === 1) movePlayer('down');
+            if (diffY === -1) movePlayer('up');
+        }
+    };
 
+    
     const handleKeyPress = (event) => {
         if (gameState !== 'playing') return;
-
+    
         switch (event.key) {
             case 'w':
+            case 'ArrowUp':
                 movePlayer('up');
                 break;
             case 'a':
+            case 'ArrowLeft':
                 movePlayer('left');
                 break;
             case 's':
+            case 'ArrowDown':
                 movePlayer('down');
                 break;
             case 'd':
+            case 'ArrowRight':
                 movePlayer('right');
                 break;
             default:
                 break;
         }
     };
+    
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeyPress);
@@ -263,10 +305,16 @@ const MineSweeperEscape = () => {
 
     const renderCellContent = (x, y) => {
         if (playerPosition.x === x && playerPosition.y === y) {
-            return '@';
+            if (showBomb) {
+                return '💣'; // Bomb emoji before explosion
+            }
+            if (explode) {
+                return '💥'; // Explosion emoji
+            }
+            return '😊'; // Player emoji
         }
         if (exitPosition.x === x && exitPosition.y === y) {
-            return 'E';
+            return '🚩';
         }
         return '.';
     };
@@ -280,19 +328,28 @@ const MineSweeperEscape = () => {
 
     const renderGrid = () => {
         const gridContent = [];
-
+    
         for (let y = 0; y < gridSize; y++) {
-            const row = [];
-            for (let x = 0; x < gridSize; x++) {
-                row.push(
-                    <GridCell key={`${x}-${y}`}>
-                        {renderCellContent(x, y)}
-                    </GridCell>
-                );
-            }
-            gridContent.push(<GridRow key={y}>{row}</GridRow>);
+        const row = [];
+        for (let x = 0; x < gridSize; x++) {
+            row.push(
+                <GridCell
+                    key={`${x}-${y}`}
+                    onClick={() => handleCellClick(x, y)}
+                    onTouchEnd={(e) => {
+                        e.preventDefault(); // Prevent the default touch behavior like scrolling
+                        handleCellClick(x, y);
+                    }}
+                >
+                    {renderCellContent(x, y)}
+                </GridCell>
+            );
         }
+        gridContent.push(<GridRow key={y}>{row}</GridRow>);
+    }
 
+    return gridContent;
+    
         return gridContent;
     };
 

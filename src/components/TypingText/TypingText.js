@@ -15,7 +15,7 @@ const TypingContainer = styled('div')(({ theme }) => ({
 
 const HighlightedText = styled('span')(({ highlighted }) => ({
     background: highlighted ? 'rgba(30, 144, 255, 0.5)' : 'none', // Light blue background to simulate highlighting
-    transition: 'background-color 0.5s', // Smooth transition for the highlighting
+    transition: 'background-color 0.25s', // Smooth transition for the highlighting
   }));
 
 const InvisibleText = styled('div')(({ theme }) => ({
@@ -37,10 +37,10 @@ const InvisibleText = styled('div')(({ theme }) => ({
 
     console.log('typingText.js useEffect');
     let isCancelled = false;
-    let animationCount = 0;
+    
     
 
-    const type = async (text, speed = 30) => {
+    const type = async (text, speed = 20) => {
       for (let char of text) {
         if (!isCancelled) {
           await new Promise((resolve) =>
@@ -53,7 +53,7 @@ const InvisibleText = styled('div')(({ theme }) => ({
       }
     };
 
-    const backspace = async (text, speed = 50) => {
+    const backspace = async (text, speed = 30) => {
       for (let i = 0; i < text.length; i++) {
         if (!isCancelled) {
           await new Promise((resolve) =>
@@ -88,13 +88,13 @@ const InvisibleText = styled('div')(({ theme }) => ({
         for (let word of words) {
         if (Math.random() < 0.1) {
           const misspelledWord = misspell(word);
-          await type(misspelledWord, 55);
-          await backspace(misspelledWord, 25);
+          await type(misspelledWord, 20);
+          await backspace(misspelledWord, 55);
         }
-        await type(word + ' ', 25);
+        await type(word + ' ', 20);
        
 
-        animationCount++;
+       
       }
       
       

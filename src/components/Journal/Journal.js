@@ -1,50 +1,117 @@
-import React, { useState } from 'react';
+// Journal.js
+
+import React, { useMemo } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import HomePage from '../../pages/HomePage';
 import AboutPage from '../../pages/AboutPage';
 import ProjectsPage from '../../pages/ProjectsPage';
+import ResumePage from '../../pages/ResumePage';
+import TableOfContentsPage from '../../pages/TableOfContentsPage'; // Import the new page
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import backgroundImage from '../../assets/images/journalBackgroundCover.jpg';
+import JournalBookmark from '../JournalBookmark/JournalBookmark';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-const StyledJournalContainer = styled(Box)(({ theme, isHomePage }) => ({
-    backgroundImage: isHomePage ? `url(${backgroundImage})` : 'none',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    height: '85vh',
-    width: `calc(85vh * (4 / 5))`, // width is 2/5 of the height
-    margin: '7.5vh auto',
-    padding: theme.spacing(.5),
-    borderRadius: '12px',
-    boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5), 10px 10px 30px rgba(0, 0, 0, 0.5)',
-   
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+const theme = createTheme({
+  typography: {
+    fontFamily: '"Cinzel", serif',
+  },
+  palette: {
+    primary: {
+      main: '#333',
+    },
+    secondary: {
+      main: '#ebd469',
+    },
+  },
+});
+
+const StyledJournalContainer = styled(Box, {
+  name: 'JournalContainer',
+})(({ theme, isHomePage }) => ({
+  backgroundImage: isHomePage ? `url(${backgroundImage})` : 'none',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  height: '90vh',
+  maxHeight: '90vh',
+  width: `calc(80vh * (4 / 5))`,
+  margin: '3vh auto',
+  borderRadius: '12px',
+  boxShadow:
+    'inset 0 0 10px rgba(0, 0, 0, 0.5), 10px 10px 30px rgba(0, 0, 0, 0.5)',
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
 }));
 
-
 const Journal = () => {
-    const location = useLocation();
-    const isHomePage = location.pathname === '/';
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
-    const [pages, setPages] = useState([
-        { path: "/", component: HomePage, title: "Home", next: "/about" },
-        { path: "/about", component: AboutPage, title: "About", next: "/projects" },
-        { path: "/projects", component: ProjectsPage, title: "Projects", next: "/" },
-    ]);
+  const pages = useMemo(() => {
+    const pageList = [
+      { path: '/', component: HomePage, title: 'Home', isBookmark: true },
+      {
+        path: '/table-of-contents',
+        component: TableOfContentsPage,
+        title: 'Table of Contents',
+        isBookmark: false, // leave for now
+      },
+      { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
+      {
+        path: '/projects',
+        component: ProjectsPage,
+        title: 'Projects',
+        isBookmark: true,
+      },
+      { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
+    ];
 
-    return (
-        <StyledJournalContainer isHomePage={isHomePage}>
-            <Routes>
-                {pages.map(page => (
-                    <Route key={page.path} path={page.path} element={<page.component nextPage={page.next} />} />
-                ))}
-            </Routes>
-        </StyledJournalContainer>
-    );
+    // Assign page numbers starting from 1 after Table of Contents
+    let pageNumberCounter = 1;
+    const pagesWithNumbers = pageList.map((page, index) => {
+      if (index >= 2) {
+        return { ...page, pageNumber: pageNumberCounter++ };
+      } else {
+        return { ...page, pageNumber: null };
+      }
+    });
+    return pagesWithNumbers;
+  }, []);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <StyledJournalContainer isHomePage={isHomePage} className="journal-container">
+        <JournalBookmark pages={pages} />
+        <Routes>
+          {pages.map((page, index) => {
+            const nextPage = pages[(index + 1) % pages.length].path;
+            const prevPage = pages[(index - 1 + pages.length) % pages.length].path;
+
+            return (
+              <Route
+                key={page.path}
+                path={page.path}
+                element={
+                  <page.component
+                    nextPage={nextPage}
+                    prevPage={prevPage}
+                    pageNumber={page.pageNumber}
+                    isBookmark={page.isBookmark}
+                    pages={page.path === '/table-of-contents' ? pages : undefined}
+                  />
+                }
+              />
+            );
+          })}
+        </Routes>
+      </StyledJournalContainer>
+    </ThemeProvider>
+  );
 };
 
 export default Journal;

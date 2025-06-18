@@ -1,16 +1,11 @@
-.typing-text-container {
-    font-family: 'Cinzel', serif;
-    color: #333;
-    /* Further styles here if needed */
-  }
-  
-  .typing-text-cursor {
-    animation: blink-animation 1s steps(5, start) infinite;
-    /* Ensure this is visible and fits the aesthetic */
-  }
-  
-  @keyframes blink-animation {
-    from { visibility: visible; }
-    to { visibility: hidden; }
+  @keyframes handwriting {
+    from {
+      width: 0;
+      opacity: 100%;
+    }
+    to {
+      width: 100%;
+      opacity: 1;
+    }
   }
   

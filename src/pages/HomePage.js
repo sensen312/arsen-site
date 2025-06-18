@@ -1,4 +1,3 @@
-// src/pages/HomePage.js
 import React from 'react';
 import JournalPage from '../components/JournalPage/JournalPage';
 import { Typography } from '@mui/material';
@@ -7,40 +6,55 @@ import logo from '../assets/images/LOGO.png';
 
 const StyledHomePage = styled('div')(({ theme }) => ({
     textAlign: 'center',
-    fontFamily: '"Permanent Marker", cursive', // Suggested font that resembles handwriting
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    fontFamily: '"Permanent Marker", cursive',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-    color: '#000000', // Setting text color to black
+    width: '100%',
+    color: '#000000',
 }));
 
-const HomePage = () => {
+// Title
+const StyledTitle = styled(Typography)(({ theme }) => ({
+    width: '80%',
+    fontSize: `calc(9vh)`,
+    letterSpacing: 1.5,
+    color: 'black',
+    textShadow: '2px 1px 1px rgba(255, 255, 255, 0.5)',
+    fontFamily: '"Permanent Marker"',
+}));
+
+// Subtitle
+const StyledSubtitle = styled(Typography)(({ theme }) => ({
+    marginBottom: theme.spacing(3),
+    fontSize: `calc(6vh)`, 
+    color: 'black',
+    fontFamily: '"Permanent Marker"',
+}));
+
+const StyledLogo = styled('img')(({ theme }) => ({
+    width: `calc(35vh)`, 
+    height: 'auto', 
+}));
+
+const HomePage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
+    console.log("In HomePage");
+    console.log(`Next Page: ${nextPage}`);
+    console.log(`Prev Page: ${prevPage}`);
+
+    isBookmark = true;
     return (
-        <JournalPage title="Home" nextPage="/about" isCover={true}>
+        <JournalPage title="Home" nextPage={nextPage} prevPage={prevPage} isCover={true} pageNumber={pageNumber}>
             <StyledHomePage>
-                <Typography variant="h3" sx={{
-                    width: '80%',
-                    fontSize: '5rem',
-                    letterSpacing: 1.5,
-                    color: 'black', // Ensuring text is black
-                    textShadow: '2px 1px 1px rgba(255,255,255,0.6)', // Adding a subtle white shadow for a glowing effect
-                    fontFamily: 'Permanent Marker' // Use a "handwritten" style font
-                }}>
+                <StyledTitle variant="h3">
                     Arsen's Webpages
-                </Typography>
-                <Typography variant="h5" sx={{
-                    marginBottom: 3,
-                    fontSize: '3rem',
-                    color: 'black',
-                    fontFamily: 'Permanent Marker'
-                }}>
+                </StyledTitle>
+                <StyledSubtitle variant="h5">
                     Journal 1
-                </Typography>
-                <img src={logo} alt="Logo" style={{ width: '200px', height: '200px' }} />
+                </StyledSubtitle>
+                <StyledLogo src={logo} alt="Logo" />
             </StyledHomePage>
         </JournalPage>
     );
