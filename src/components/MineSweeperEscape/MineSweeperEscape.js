@@ -180,9 +180,9 @@ const generateSolvablePath = (gridSize, start, end) => {
 };
 
 const difficultySettings = {
-    Easy: { size: 5, lives: 20 },
-    Medium: { size: 7, lives: 10 },
-    Hard: { size: 9, lives: 5 }
+    Easy: { size: 5, lives: 15 },
+    Medium: { size: 7, lives: 7 },
+    Hard: { size: 9, lives: 3 }
 };
 
 
@@ -207,21 +207,32 @@ const MineSweeperEscape = () => {
         setLives(settings.lives);
         setExplodingCell(null);
 
-        const startPos = { x: 0, y: Math.floor(Math.random() * currentGridSize) };
-        let endPos = { x: currentGridSize - 1, y: Math.floor(Math.random() * currentGridSize) };
-        
-        while(startPos.y === endPos.y && currentGridSize > 1) {
-             endPos = { x: currentGridSize - 1, y: Math.floor(Math.random() * currentGridSize) };
-        }
+        let startPos, endPos, solutionPath;
+        const minDistance = 3;
+
+        do {
+            startPos = { 
+                x: Math.floor(Math.random() * currentGridSize), 
+                y: Math.floor(Math.random() * currentGridSize) 
+            };
+            endPos = { 
+                x: Math.floor(Math.random() * currentGridSize), 
+                y: Math.floor(Math.random() * currentGridSize) 
+            };
+
+            const distance = Math.abs(startPos.x - endPos.x) + Math.abs(startPos.y - endPos.y);
+
+            if (distance > minDistance) {
+                solutionPath = generateSolvablePath(currentGridSize, startPos, endPos);
+            } else {
+                solutionPath = []; // Force a retry if distance is too small
+            }
+
+        } while (solutionPath.length === 0);
 
         setPlayerPosition(startPos);
         setExitPosition(endPos);
 
-        const solutionPath = generateSolvablePath(currentGridSize, startPos, endPos);
-        if (solutionPath.length === 0) {
-            setTimeout(() => startGame(diff), 100);
-            return;
-        }
         const solutionCoords = new Set(solutionPath.map(p => `${p.x},${p.y}`));
 
         let newGrid = Array.from({ length: currentGridSize }, (_, y) =>
@@ -261,8 +272,6 @@ const MineSweeperEscape = () => {
         setTimer(0);
     };
     
-    // Removed the useEffect that automatically started the game on mount.
-
     useEffect(() => {
         let interval = null;
         if (gameState === 'playing') {
@@ -323,15 +332,11 @@ const MineSweeperEscape = () => {
         const diffX = Math.abs(x - playerPosition.x);
         const diffY = Math.abs(y - playerPosition.y);
         
-        // This is the condition for a valid move: must be one step away and not diagonal.
         const isValidMove = diffX + diffY === 1;
 
         if (!isValidMove) {
-            // If the move is not valid (e.g., diagonal or too far), do nothing.
             return;
         }
-
-        // --- Logic below only executes for valid, orthogonal moves ---
 
         if (targetCell.isBomb && !targetCell.isRevealed) {
             const newLives = lives - 1;
@@ -500,7 +505,7 @@ const MineSweeperEscape = () => {
 
             {gameState === 'playing' && grid.length > 0 && (
                  <>
-                    <StyledGameInfoRow>Timer: {timer}s | Lives: {lives}</StyledGameInfoRow>
+                    <StyledGameInfoRow>Timer: {timer}s | ❤️ Lives: {lives}</StyledGameInfoRow>
                     {renderGrid()}
                  </>
             )}
