@@ -16,8 +16,8 @@ const WritingContainer = styled('div')({
 
 const QuillCursor = styled(motion.span)({
   position: 'absolute',
-  top: -18,
-  left: 20,
+  top: -20,
+  left: 25,
   zIndex: 0,
  
   pointerEvents: 'none',
@@ -103,7 +103,10 @@ const WritingText = ({ message, onFinish, repeat = false }) => {
 
     const animateWriting = async () => {
         while (!isCancelled) {
-            await textControls.set({ pathLength: 0, opacity: 1 });
+            // SOLUS FIX 1: Reset ALL paths to be undrawn AND unfilled.
+            // This ensures a clean slate for each animation loop.
+            await textControls.set({ pathLength: 0, fill: "transparent", opacity: 1 });
+            
             quillControls.set({ opacity: 0 });
             await quillControls.start({ opacity: 1, transition: { duration: 0.5 } });
 
@@ -125,7 +128,14 @@ const WritingText = ({ message, onFinish, repeat = false }) => {
                 });
 
                 const textAnimation = textControls.start(custom => 
-                    custom === i ? { pathLength: 1, transition: { duration, ease: 'linear' } } : {}
+                    custom === i ? { 
+                        pathLength: 1, 
+                        fill: '#333',
+                        transition: { 
+                            pathLength: { duration, ease: 'linear' },
+                            fill: { duration: 0.1, delay: duration }
+                        }
+                    } : {}
                 );
                 const quillAnimation = quillControls.start({
                     offsetDistance: "100%",
@@ -141,6 +151,7 @@ const WritingText = ({ message, onFinish, repeat = false }) => {
             
             if (repeatRef.current) {
                 await new Promise(resolve => setTimeout(resolve, 3000));
+                // The loop will now restart correctly because of the .set() call above.
             } else {
                 if (onFinishRef.current) {
                     onFinishRef.current();
@@ -170,7 +181,6 @@ const WritingText = ({ message, onFinish, repeat = false }) => {
                 key={index}
                 id={`path-${index}`}
                 d={p.d}
-                fill="#333"
                 stroke="#333"
                 strokeWidth=".6"
                 custom={index}
