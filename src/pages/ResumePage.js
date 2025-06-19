@@ -2,6 +2,7 @@ import React from 'react';
 import JournalPage from '../components/JournalPage/JournalPage';
 import { styled } from '@mui/system';
 import { Button } from '@mui/material';
+import SEO from '../components/SEO/SEO';
 
 const ResumeContainer = styled('div')({
   lineHeight: '24px',
@@ -49,6 +50,14 @@ const ResumePage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
     isBookmark = true;
 
     return (
+        <>
+        <SEO 
+                title="Resume | Arsen Aldea's Developer Site"
+                description="View the professional resume of Arsen Aldea, a software developer with experience in full-stack development, C++, and various modern frameworks. Download the PDF from his site."
+                name="Arsen Aldea"
+                type="article"
+            />
+
         <JournalPage title="Resume (Abridged)" nextPage={nextPage} prevPage={prevPage} isCover={false} pageNumber={pageNumber}>
             <ResumeContainer>
                 <div style={{ textAlign: 'center' }}>
@@ -100,6 +109,7 @@ const ResumePage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
                 <DownloadButton onClick={handleDownloadResume}>Download Resume</DownloadButton>
             </ResumeContainer>
         </JournalPage>
+        </>
     );
 };
 

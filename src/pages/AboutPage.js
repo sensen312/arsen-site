@@ -4,7 +4,7 @@ import TypingText from '../components/TypingText/TypingText';
 import WritingText from '../components/WritingText/WritingText';
 import { styled } from '@mui/system';
 import aboutPic from '../assets/images/aboutPic.jpg';
-
+import SEO from '../components/SEO/SEO';
 
 const PolaroidImage = styled('img')(({ theme }) => ({
     position: 'absolute',
@@ -32,17 +32,24 @@ const AboutPage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
     const handleWritingFinish = () => {
         setIsWritingFinished(true);
     };
-
-
     return (
-      <JournalPage title="About Me" nextPage={nextPage} prevPage={prevPage} isCover={false} pageNumber={pageNumber}>
-        <WritingText message={message} repeat={true} onFinish={handleWritingFinish} />
+      <>
+        <SEO 
+            title="About Me | Arsen Aldea Site"
+            description="Learn more about Arsen Aldea, a full-stack developer with experience at FLVS and PerfectServe. Discover his skills in React, .NET, and more on his personal site."
+            name="Arsen Aldea"
+            type="article"
+        />
+        <JournalPage title="About Me" nextPage={nextPage} prevPage={prevPage} isCover={false} pageNumber={pageNumber}>
+          <WritingText message={message} repeat={true} onFinish={handleWritingFinish} />
+          {/*<TypingText message={message} repeat={true} onFinish={handleTypingFinish} />*/}
 
-        {/*<TypingText message={message} repeat={true} onFinish={handleTypingFinish} />*/}
-        <PolaroidImage src={aboutPic} alt="About Arsen" />
-      </JournalPage>
+          <PolaroidImage src={aboutPic} alt="About Arsen" />
+        </JournalPage>
+      </>
     );
-    
+
+  
 };
 
 export default AboutPage;

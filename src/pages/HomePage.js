@@ -4,6 +4,7 @@ import { Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import logo from '../assets/images/LOGO.png';
 import backgroundImage from '../assets/images/journalBackgroundCover.jpg';
+import SEO from '../components/SEO/SEO';
 
 const StyledHomePage = styled('div')(({ theme }) => ({
   textAlign: 'center',
@@ -48,19 +49,28 @@ const StyledLogo = styled('img')(({ theme }) => ({
 
 const HomePage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
     isBookmark = true;
-    return (
-        <JournalPage title="Home" nextPage={nextPage} prevPage={prevPage} isCover={true} pageNumber={pageNumber}>
-            <StyledHomePage>
-                <StyledTitle variant="h3">
-                    Arsen's Webpages
-                </StyledTitle>
-                <StyledSubtitle variant="h5">
-                    Journal I
-                </StyledSubtitle>
-                <StyledLogo src={logo} alt="Logo" />
-            </StyledHomePage>
-        </JournalPage>
+     return (
+        <>
+            <SEO 
+                title="Arsen Aldea Site - Personal Portfolio & Journal"
+                description="Welcome to the personal portfolio and interactive journal of Arsen Aldea, a Computer Science graduate. Explore projects, resume, and thoughts on this unique site."
+                name="Arsen Aldea"
+                type="website"
+            />
+            <JournalPage title="Home" nextPage={nextPage} prevPage={prevPage} isCover={true} pageNumber={pageNumber}>
+                <StyledHomePage>
+                    <StyledTitle variant="h3">
+                        Arsen's Webpages
+                    </StyledTitle>
+                    <StyledSubtitle variant="h5">
+                        Journal I
+                    </StyledSubtitle>
+                    <StyledLogo src={logo} alt="Logo" />
+                </StyledHomePage>
+            </JournalPage>
+        </>
     );
+
 };
 
 export default HomePage;

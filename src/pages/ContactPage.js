@@ -3,7 +3,7 @@ import emailjs from '@emailjs/browser';
 import JournalPage from '../components/JournalPage/JournalPage';
 import { styled } from '@mui/system';
 import { Button, Typography } from '@mui/material';
-
+import SEO from '../components/SEO/SEO';
 
 const FormContainer = styled('form')({
     padding: '24px 2rem 0 2rem', 
@@ -131,30 +131,39 @@ const ContactPage = ({ nextPage, prevPage, pageNumber }) => {
     };
 
     return (
-        <JournalPage title="Contact" nextPage={nextPage} prevPage={prevPage} pageNumber={pageNumber}>
-            <FormContainer ref={form} onSubmit={sendEmail}>
-                <InputRow>
-                    <StyledLabel htmlFor="from_name">Name:</StyledLabel>
-                    <StyledInput type="text" name="from_name" id="from_name" required placeholder="write here..." />
-                </InputRow>
-                <InputRow>
-                    <StyledLabel htmlFor="contact_info">Contact Info:</StyledLabel>
-                    <StyledInput type="text" name="contact_info" id="contact_info" required placeholder="write here..." />
-                </InputRow>
+        <>
+            <SEO 
+                title="Contact Arsen Aldea | Portfolio Site"
+                description="Get in touch with Arsen Aldea through the contact page on his personal portfolio site. Reach out for collaboration or inquiries."
+                name="Arsen Aldea"
+                type="profile"
+            />
+            <JournalPage title="Contact" nextPage={nextPage} prevPage={prevPage} pageNumber={pageNumber}>
+                <FormContainer ref={form} onSubmit={sendEmail}>
+                    <InputRow>
+                        <StyledLabel htmlFor="from_name">Name:</StyledLabel>
+                        <StyledInput type="text" name="from_name" id="from_name" required placeholder="write here..." />
+                    </InputRow>
+                    <InputRow>
+                        <StyledLabel htmlFor="contact_info">Contact Info:</StyledLabel>
+                        <StyledInput type="text" name="contact_info" id="contact_info" required placeholder="write here..." />
+                    </InputRow>
+                    
                 
-               
-                <InputRow>
-                     <StyledLabel htmlFor="message">Message:</StyledLabel>
-                </InputRow>
-                <StyledTextarea name="message" id="message" required placeholder="write here..." />
+                    <InputRow>
+                        <StyledLabel htmlFor="message">Message:</StyledLabel>
+                    </InputRow>
+                    <StyledTextarea name="message" id="message" required placeholder="write here..." />
 
-                <SubmitButton type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Sending..." : "Submit Message"}
-                </SubmitButton>
-                {statusMessage && <Typography style={{ textAlign: 'center', marginTop: '24px', fontSize: '1.1rem' }}>{statusMessage}</Typography>}
-            </FormContainer>
-        </JournalPage>
+                    <SubmitButton type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? "Sending..." : "Submit Message"}
+                    </SubmitButton>
+                    {statusMessage && <Typography style={{ textAlign: 'center', marginTop: '24px', fontSize: '1.1rem' }}>{statusMessage}</Typography>}
+                </FormContainer>
+            </JournalPage>
+        </>
     );
+
 };
 
 export default ContactPage;

@@ -4,6 +4,8 @@ import TypingText from '../components/TypingText/TypingText';
 import WritingText from '../components/WritingText/WritingText';
 
 import MineSweeperEscape from '../components/MineSweeperEscape/MineSweeperEscape';
+import SEO from '../components/SEO/SEO';
+
 
 const ProjectsPage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
     const [isTypingFinished, setIsTypingFinished] = useState(false);
@@ -23,14 +25,23 @@ const ProjectsPage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
     isBookmark = true;
 
     
-    return (
-        <JournalPage title="Projects (under construction)" nextPage={nextPage} prevPage={prevPage} isCover={false} pageNumber={pageNumber}>
-            <WritingText message={message} repeat={false} onFinish={handleWritingFinish} />
+     return (
+        <>
+            <SEO 
+                title="Projects | Arsen Aldea's Portfolio Site"
+                description="Explore the projects of Arsen Aldea on his personal portfolio site, including an interactive Minesweeper Escape game built with React."
+                name="Arsen Aldea"
+                type="article"
+            />
+            <JournalPage title="Projects (under construction)" nextPage={nextPage} prevPage={prevPage} isCover={false} pageNumber={pageNumber}>
+                <WritingText message={message} repeat={false} onFinish={handleWritingFinish} />
+                 {/*<TypingText message={message} repeat={true} onFinish={handleTypingFinish} />*/}
 
-        {/*<TypingText message={message} repeat={true} onFinish={handleTypingFinish} />*/}
-            {isWritingFinished ? <MineSweeperEscape /> : null}
-        </JournalPage>
+                {isWritingFinished ? <MineSweeperEscape /> : null}
+            </JournalPage>
+        </>
     );
+
 };
 
 export default ProjectsPage;
