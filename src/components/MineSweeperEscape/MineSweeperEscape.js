@@ -14,7 +14,7 @@ const GameContainer = styled(Paper)(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'top',
     position: 'relative',
-    paddingTop: theme.spacing(.5),
+    paddingTop: theme.spacing(4.4),
 }));
 
 // not the best syntax but
@@ -34,8 +34,8 @@ const StyledButton = styled(Button)(({ theme }) => ({
     display: 'flex',
     justifyContent: 'center', // Center text inside the button
     alignItems: 'center', // Center text inside the button
-    margin: '0 auto', // Center the button horizontally
-    padding: theme.spacing(1, 4), // Add padding for better spacing
+    margin: '20% auto', // Center the button horizontally
+    padding: theme.spacing(1, 2), // Add padding for better spacing
 }));
 
 
