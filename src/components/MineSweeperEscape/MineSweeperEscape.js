@@ -13,7 +13,7 @@ const GameContainer = styled(Paper)(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     position: 'relative',
-    paddingTop: theme.spacing(4),
+    paddingTop: theme.spacing(1),
     minHeight: '450px',
 }));
 
