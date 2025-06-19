@@ -31,7 +31,7 @@ const StyledTitle = styled(Typography)(({ theme }) => ({
   fontSize: `calc(7vh)`,
   letterSpacing: 1.5,
   color: 'black',
-  textShadow: '2px 1px 1px rgba(255, 255, 255, 0.5)',
+  textShadow: '2px 1px 1px rgba(74, 23, 23, 0.5)',
   fontFamily: '"Permanent Marker"',
 }));
 
@@ -49,28 +49,20 @@ const StyledLogo = styled('img')(({ theme }) => ({
 
 const HomePage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
     isBookmark = true;
-     return (
-        <>
-            <SEO 
-                title="Arsen Aldea Site - Personal Portfolio & Journal"
-                description="Welcome to the personal portfolio and interactive journal of Arsen Aldea, a Computer Science graduate. Explore projects, resume, and thoughts on this unique site."
-                name="Arsen Aldea"
-                type="website"
-            />
-            <JournalPage title="Home" nextPage={nextPage} prevPage={prevPage} isCover={true} pageNumber={pageNumber}>
-                <StyledHomePage>
-                    <StyledTitle variant="h3">
-                        Arsen's Webpages
-                    </StyledTitle>
-                    <StyledSubtitle variant="h5">
-                        Journal I
-                    </StyledSubtitle>
-                    <StyledLogo src={logo} alt="Logo" />
-                </StyledHomePage>
-            </JournalPage>
-        </>
+    return (
+        
+        <JournalPage title="Home" nextPage={nextPage} prevPage={prevPage} isCover={true} pageNumber={pageNumber}>
+            <StyledHomePage>
+                <StyledTitle variant="h3">
+                    Arsen's Webpages
+                </StyledTitle>
+                <StyledSubtitle variant="h5">
+                    Journal I
+                </StyledSubtitle>
+                <StyledLogo src={logo} alt="Logo" />
+            </StyledHomePage>
+        </JournalPage>
     );
-
 };
 
 export default HomePage;
