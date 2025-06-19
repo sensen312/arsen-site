@@ -45,13 +45,16 @@
             q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
           });
           if (q.p) {
-            window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + q.p.slice(0, -1) + (q.q ? ('?' + q.q) : '') + l.hash
-            );
+            
+            var newPath = l.pathname.slice(0, l.pathname.lastIndexOf('/') + 1) + q.p;
+            var newSearch = q.q ? '?' + q.q : '';
+            var newHash = q.h ? '#' + q.h : '';
+            window.history.replaceState(null, null, newPath + newSearch + newHash);
           }
         }
       }(window.location))
     </script>
+
 
 </head>
 <body>

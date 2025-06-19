@@ -34,7 +34,6 @@ const WritingText = ({ message, onFinish, repeat = false }) => {
   const textControls = useAnimation();
   const quillControls = useAnimation();
 
-  // Create stable refs for props used in the animation loop
   const onFinishRef = useRef(onFinish);
   const repeatRef = useRef(repeat);
   useEffect(() => {
@@ -171,9 +170,9 @@ const WritingText = ({ message, onFinish, repeat = false }) => {
                 key={index}
                 id={`path-${index}`}
                 d={p.d}
-                fill="none"
+                fill="#333"
                 stroke="#333"
-                strokeWidth="1.2"
+                strokeWidth=".6"
                 custom={index}
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={textControls}

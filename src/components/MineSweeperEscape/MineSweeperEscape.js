@@ -111,10 +111,10 @@ const MineSweeperEscape = () => {
     const [lives, setLives] = useState(initialLives);
     const [timer, setTimer] = useState(0);
     const [gameState, setGameState] = useState('idle'); // idle, playing, gameOver
-
-
-    const [scores, setScores] = useState(() => JSON.parse(localStorage.getItem('minesweeper_scores')) || []);
-    const [highestScore, setHighestScore] = useState(() => parseInt(localStorage.getItem('minesweeper_highestScore')) || 0);
+    const [scores, setScores] = useState([]);
+    const [highestScore, setHighestScore] = useState(
+        parseInt(localStorage.getItem('highestScore')) || 0
+    );
 
     useEffect(() => {
         if (gameState === 'playing') {
@@ -124,35 +124,6 @@ const MineSweeperEscape = () => {
             return () => clearInterval(interval);
         }
     }, [gameState]);
-
-    useEffect(() => {
-        if (gameState === 'gameOver') {
-            // Only save scores on victory
-            if (lives > 0) {
-                updateScores(timer);
-            }
-        }
-    }, [gameState]);
-
-
-    const updateScores = (newScore) => {
-        // Update Top 5 Scores
-        const updatedScores = [...scores, newScore];
-        updatedScores.sort((a, b) => a - b); // Sort ascending (lower is better)
-        if (updatedScores.length > 5) {
-            updatedScores.length = 5; // Keep only top 5
-        }
-        setScores(updatedScores);
-        localStorage.setItem('minesweeper_scores', JSON.stringify(updatedScores));
-
-        // Update Highest Score (Best Time)
-        if (highestScore === 0 || newScore < highestScore) {
-            setHighestScore(newScore);
-            localStorage.setItem('minesweeper_highestScore', newScore.toString());
-        }
-    };
-
-
 
     const startGame = () => {
         setGameState('playing');
