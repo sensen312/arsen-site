@@ -180,9 +180,9 @@ const generateSolvablePath = (gridSize, start, end) => {
 };
 
 const difficultySettings = {
-    Easy: { size: 5, lives: 15 },
-    Medium: { size: 7, lives: 7 },
-    Hard: { size: 9, lives: 3 }
+    Easy: { size: 5, lives: 10 },
+    Medium: { size: 7, lives: 5 },
+    Hard: { size: 9, lives: 2 }
 };
 
 
