@@ -95,327 +95,305 @@ const StyledScoreTypography = styled(Typography)(({ theme }) => ({
 
 
 
-
 const MineSweeperEscape = () => {
-    const theme = useTheme();
-    const navigate = useNavigate();
-    const gridSize = 8;
-    const minePercentage = 0.2;
-    const initialLives = 3;
+const theme = useTheme();
+const navigate = useNavigate();
+const gridSize = 8;
+const minePercentage = 0.2;
+const initialLives = 3;
+const LEADERBOARD_KEY = 'minesweeper_scores'; // Using a specific key for local storage
 
-    const [grid, setGrid] = useState([]);
-    const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
-    const [exitPosition, setExitPosition] = useState({ x: 0, y: 0 });
-    const [mines, setMines] = useState([]);
-    const [lives, setLives] = useState(initialLives);
-    const [timer, setTimer] = useState(0);
-    const [gameState, setGameState] = useState('idle'); // idle, playing, gameOver
-    const [highestScore, setHighestScore] = useState(
-        parseInt(localStorage.getItem('highestScore')) || 0
+const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
+const [exitPosition, setExitPosition] = useState({ x: 0, y: 0 });
+const [mines, setMines] = useState([]);
+const [lives, setLives] = useState(initialLives);
+const [timer, setTimer] = useState(0); // Timer now tracks centiseconds
+const [gameState, setGameState] = useState('idle'); // idle, playing, gameOver
+const [leaderboard, setLeaderboard] = useState([]); // Single source of truth for scores
+const [explode, setExplode] = useState(false);
+const [showBomb, setShowBomb] = useState(false);
+
+
+// Timer effect - runs every 10ms for hundredths of a second
+useEffect(() => {
+    let interval = null;
+    if (gameState === 'playing') {
+        interval = setInterval(() => {
+            setTimer((prevTimer) => prevTimer + 1);
+        }, 10); // Update every 10ms for centiseconds
+    }
+    return () => clearInterval(interval);
+}, [gameState]);
+
+
+// Effect to handle game over logic (saving score, loading leaderboard)
+useEffect(() => {
+    if (gameState === 'gameOver') {
+        // If player won (has lives left), save the score.
+        if (lives > 0) {
+             saveScore(timer);
+        } else {
+             // If player lost, just load the leaderboard without saving a new score.
+            const savedScores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
+            setLeaderboard(savedScores);
+        }
+    }
+}, [gameState]); // This effect runs only when the game state changes to 'gameOver'
+
+
+const startGame = () => {
+    setGameState('playing');
+    setTimer(0);
+    setLives(initialLives);
+    setLeaderboard([]);
+
+    // Random starting position and exit position
+    const randomPosition = () => ({
+        x: Math.floor(Math.random() * gridSize),
+        y: Math.floor(Math.random() * gridSize)
+    });
+
+    let startPosition = randomPosition();
+    let endPosition = randomPosition();
+
+    // Ensure starting and ending positions are not the same
+    while (
+        startPosition.x === endPosition.x &&
+        startPosition.y === endPosition.y
+    ) {
+        endPosition = randomPosition();
+    }
+
+    setPlayerPosition(startPosition);
+    setExitPosition(endPosition);
+
+    // Random mines
+    const mineCount = Math.floor(gridSize * gridSize * minePercentage);
+    let newMines = [];
+
+    for (let i = 0; i < mineCount; i++) {
+        let minePosition = randomPosition();
+
+        // Ensure mine is not on starting position or exit position
+        while (
+            (minePosition.x === startPosition.x &&
+                minePosition.y === startPosition.y) ||
+            (minePosition.x === endPosition.x && minePosition.y === endPosition.y)
+        ) {
+            minePosition = randomPosition();
+        }
+
+        newMines.push(minePosition);
+    }
+
+    setMines(newMines);
+};
+
+const saveScore = (score) => {
+    const savedScores = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
+    const newScores = [...savedScores, score];
+    // Sort scores in ascending order (lower time is better)
+    newScores.sort((a, b) => a - b);
+    // Keep only the top 5 scores
+    const topScores = newScores.slice(0, 5);
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(topScores));
+    // Update the state to reflect the change immediately on the game over screen
+    setLeaderboard(topScores);
+};
+
+const movePlayer = useCallback((direction) => {
+    if (gameState !== 'playing') return;
+
+    let newX = playerPosition.x;
+    let newY = playerPosition.y;
+
+    switch (direction) {
+        case 'up':
+            newY = Math.max(0, newY - 1);
+            break;
+        case 'down':
+            newY = Math.min(gridSize - 1, newY + 1);
+            break;
+        case 'left':
+            newX = Math.max(0, newX - 1);
+            break;
+        case 'right':
+            newX = Math.min(gridSize - 1, newX + 1);
+            break;
+        default:
+            return;
+    }
+
+    const newPosition = { x: newX, y: newY };
+    
+    // Check for exit collision - WIN CONDITION
+    if (newPosition.x === exitPosition.x && newPosition.y === exitPosition.y) {
+        setPlayerPosition(newPosition);
+        setGameState('gameOver'); // Just set the state, the useEffect will handle saving
+        return;
+    }
+
+    // Check for mine collision
+    const mineIndex = mines.findIndex(
+        (mine) => mine.x === newPosition.x && mine.y === newPosition.y
     );
 
-    useEffect(() => {
-        if (gameState === 'playing') {
-            const interval = setInterval(() => {
-                setTimer((timer) => timer + 1);
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [gameState]);
+    if (mineIndex !== -1) {
+        setShowBomb(true);
+        setMines(mines.filter((_, index) => index !== mineIndex));
 
-    const startGame = () => {
-        setGameState('playing');
-        setTimer(0);
-        setLives(initialLives);
-
-        // Random starting position and exit position
-        const randomPosition = () => ({
-            x: Math.floor(Math.random() * gridSize),
-            y: Math.floor(Math.random() * gridSize)
+        setTimeout(() => {
+            setExplode(true);
+            setTimeout(() => setExplode(false), 100);
+            setShowBomb(false);
+        }, 200); 
+        
+        setLives((prevLives) => {
+            const updatedLives = prevLives - 1;
+            // LOSS CONDITION
+            if (updatedLives <= 0) {
+                setGameState('gameOver'); // Game over, but don't save score on loss
+            }
+            return updatedLives;
         });
-
-        let startPosition = randomPosition();
-        let endPosition = randomPosition();
-
-        // Ensure starting and ending positions are not the same
-        while (
-            startPosition.x === endPosition.x &&
-            startPosition.y === endPosition.y
-        ) {
-            endPosition = randomPosition();
-        }
-
-        setPlayerPosition(startPosition);
-        setExitPosition(endPosition);
-
-        // Random mines
-        const mineCount = Math.floor(gridSize * gridSize * minePercentage);
-        let newMines = [];
-
-        for (let i = 0; i < mineCount; i++) {
-            let minePosition = randomPosition();
-
-            // Ensure mine is not on starting position or exit position
-            while (
-                (minePosition.x === startPosition.x &&
-                    minePosition.y === startPosition.y) ||
-                (minePosition.x === endPosition.x && minePosition.y === endPosition.y)
-            ) {
-                minePosition = randomPosition();
-            }
-
-            newMines.push(minePosition);
-        }
-
-        setMines(newMines);
-    };
-
-    const saveScore = (score) => {
-        // This function is only called on victory.
-        if (typeof score !== 'number' || isNaN(score)) {
-            return;
-        }
+    }
     
-        // Update Leaderboard in localStorage
-        const savedScores = JSON.parse(localStorage.getItem('scores')) || [];
-        savedScores.push(score);
-        savedScores.sort((a, b) => a - b); // Sort ascending (lower time is better)
-        const newTopScores = savedScores.slice(0, 5); // Take only the top 5
-        localStorage.setItem('scores', JSON.stringify(newTopScores));
-    
-        // Update the 'highestScore' state, which tracks the best score (lowest time).
-        if (newTopScores.length > 0) {
-            const bestScore = newTopScores[0];
-            // Also update the separate localStorage item for `highestScore` for persistence.
-            localStorage.setItem('highestScore', bestScore.toString());
-            setHighestScore(bestScore);
-        }
-    };
+    setPlayerPosition(newPosition);
+}, [gameState, playerPosition, mines, gridSize]);
 
-    const [explode, setExplode] = useState(false);
-    const [showBomb, setShowBomb] = useState(false);
+const handleCellClick = (x, y) => {
+    if (gameState !== 'playing') return;
 
+    const diffX = x - playerPosition.x;
+    const diffY = y - playerPosition.y;
 
-    const movePlayer = (direction) => {
-        let newX = playerPosition.x;
-        let newY = playerPosition.y;
+    if (Math.abs(diffX) + Math.abs(diffY) === 1) {
+        if (diffX === 1) movePlayer('right');
+        else if (diffX === -1) movePlayer('left');
+        else if (diffY === 1) movePlayer('down');
+        else if (diffY === -1) movePlayer('up');
+    }
+};
 
-        switch (direction) {
-            case 'up':
-                newY = Math.max(0, newY - 1);
-                break;
-            case 'down':
-                newY = Math.min(gridSize - 1, newY + 1);
-                break;
-            case 'left':
-                newX = Math.max(0, newX - 1);
-                break;
-            case 'right':
-                newX = Math.min(gridSize - 1, newX + 1);
-                break;
-            default:
-                return; // Return early if the direction is invalid
-        }
-
-        const newPosition = { x: newX, y: newY };
-
-        // Check for mine collision
-        const mineIndex = mines.findIndex(
-            (mine) => mine.x === newPosition.x && mine.y === newPosition.y
-        );
-    
-        if (mineIndex !== -1) {
-            // Initiating explodeing animation
-            setShowBomb(true);
-            setMines(mines => mines.filter((_, index) => index !== mineIndex));
-
-            setTimeout(() => {
-                setExplode(true);
-                setTimeout(() => setExplode(false), 100); // Explode for 300ms
-
-                setShowBomb(false); // Hide bomb emoji after starting the explosion
-
-                // Remove the exploded mine from the mines array
-            }, 200); 
-            
-            setLives((prevLives) => {
-                const updatedLives = prevLives - 1;
-                if (updatedLives <= 0) {
-                    setGameState('gameOver');
-                }
-                return updatedLives;
-            });
-        }
-        
-        // Update the player position if there is no collision
-        setPlayerPosition(newPosition);
-
-        // Check for exit collision
-        if (newPosition.x === exitPosition.x && newPosition.y === exitPosition.y) {
-            setGameState('gameOver'); // Set game over state on reaching the exit
-            saveScore(timer); // Save the score as the player wins
-        }
-        
-    };
-
-    const handleCellClick = (x, y) => {
-        if (gameState !== 'playing') return;
-    
-        const diffX = x - playerPosition.x;
-        const diffY = y - playerPosition.y;
-    
-        if (Math.abs(diffX) + Math.abs(diffY) === 1) { // Ensure that it's an adjacent cell
-            if (diffX === 1) movePlayer('right');
-            if (diffX === -1) movePlayer('left');
-            if (diffY === 1) movePlayer('down');
-            if (diffY === -1) movePlayer('up');
-        }
-    };
-
-    
-    const handleKeyPress = (event) => {
-        if (gameState !== 'playing') return;
-    
-        switch (event.key) {
-            case 'w':
-            case 'ArrowUp':
-                movePlayer('up');
-                break;
-            case 'a':
-            case 'ArrowLeft':
-                movePlayer('left');
-                break;
-            case 's':
-            case 'ArrowDown':
-                movePlayer('down');
-                break;
-            case 'd':
-            case 'ArrowRight':
-                movePlayer('right');
-                break;
-            default:
-                break;
-        }
-    };
-    
-
-    useEffect(() => {
-        window.addEventListener('keydown', handleKeyPress);
-        return () => window.removeEventListener('keydown', handleKeyPress);
-    }, [gameState, handleKeyPress]);
-
-    const renderCellContent = (x, y) => {
-        if (playerPosition.x === x && playerPosition.y === y) {
-            if (showBomb) {
-                return '💣'; // Bomb emoji before explosion
-            }
-            if (explode) {
-                return '💥'; // Explosion emoji
-            }
-            return '😊'; // Player emoji
-        }
-        if (exitPosition.x === x && exitPosition.y === y) {
-            return '🚩';
-        }
-        return '.';
-    };
-
-    const renderHealthBar = () => {
-        return Array(lives)
-            .fill('♥')
-            .join(' ');
-    };
+const handleKeyPress = useCallback((event) => {
+    if (gameState !== 'playing') return;
+    switch (event.key) {
+        case 'w': case 'ArrowUp': movePlayer('up'); break;
+        case 'a': case 'ArrowLeft': movePlayer('left'); break;
+        case 's': case 'ArrowDown': movePlayer('down'); break;
+        case 'd': case 'ArrowRight': movePlayer('right'); break;
+        default: break;
+    }
+}, [gameState, movePlayer]);
 
 
-    const renderGrid = () => {
-        const gridContent = [];
-    
-        for (let y = 0; y < gridSize; y++) {
-        const row = [];
-        for (let x = 0; x < gridSize; x++) {
-            row.push(
+useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+}, [handleKeyPress]);
+
+// Helper function to format time
+const formatTime = (timeInCentiseconds) => {
+    return (timeInCentiseconds / 100).toFixed(2);
+};
+
+const renderCellContent = (x, y) => {
+    if (playerPosition.x === x && playerPosition.y === y) {
+        if (showBomb) return '💣';
+        if (explode) return '💥';
+        return '😊';
+    }
+    if (exitPosition.x === x && exitPosition.y === y) {
+        return '🚩';
+    }
+    return '.';
+};
+
+const renderHealthBar = () => {
+    return Array(lives).fill('♥').join(' ');
+};
+
+const renderGrid = () => {
+    return Array.from({ length: gridSize }, (_, y) => (
+        <GridRow key={y}>
+            {Array.from({ length: gridSize }, (_, x) => (
                 <GridCell
                     key={`${x}-${y}`}
                     onClick={() => handleCellClick(x, y)}
                     onTouchEnd={(e) => {
-                        e.preventDefault(); // Prevent the default touch behavior like scrolling
+                        e.preventDefault();
                         handleCellClick(x, y);
                     }}
                 >
                     {renderCellContent(x, y)}
                 </GridCell>
-            );
-        }
-        gridContent.push(<GridRow key={y}>{row}</GridRow>);
+            ))}
+        </GridRow>
+    ));
+};
+
+const renderTopScores = () => {
+    if (leaderboard.length === 0) {
+        return <Typography sx={{fontFamily: '"Cinzel", serif', color: '#333', textAlign: 'center'}}>No scores yet. Be the first!</Typography>;
     }
 
-    return gridContent;
-    };
-
-    const renderTopScores = () => {
-        const savedScores = JSON.parse(localStorage.getItem('scores')) || [];
-        // Only render if there are scores to display
-        if (savedScores.length === 0) {
-            return <Typography sx={{fontFamily: '"Cinzel", serif', color: '#333', fontStyle: 'italic', lineHeight: '24px',}}>No scores yet. Be the first!</Typography>;
-        }
-        return (
-            <ol style={{ fontFamily: '"Cinzel", serif', color: '#333', lineHeight: '24px', fontSize: '1.3rem' }}>
-                {savedScores.map((score, index) => (
-                    <li key={index}>{score}s</li>
-                ))}
-            </ol>
-        );
-    };
-
-    const renderGameScreen = () => {
-        if (gameState === 'playing') {
-            return (
-                <>
-                    <StyledGameInfoRow>
-                        <Typography>Timer: {timer}s</Typography>
-                    </StyledGameInfoRow>
-                    <StyledGameInfoRow>
-                        <Typography>Lives: {renderHealthBar()}</Typography>
-                    </StyledGameInfoRow>
-                    <GridContainer>{renderGrid()}</GridContainer>
-                </>
-            );
-        } else if (gameState === 'gameOver') {
-            return (
-                <>
-                    <StyledGameInfoRow>
-                        <StyledScoreTypography variant="h5">
-                            {lives <= 0 ? 'Defeat!' : 'Victory!'}
-                        </StyledScoreTypography>
-                        {lives > 0 && <StyledScoreTypography>Your score: {timer}s</StyledScoreTypography>}
-                        <StyledScoreTypography>Highest score: {highestScore}s</StyledScoreTypography>
-                    </StyledGameInfoRow>
-                    <StyledScoreTypography variant="h6">Top Scores:</StyledScoreTypography>
-                    {renderTopScores()}
-                    <StyledButton variant="contained" onClick={startGame}>
-                        {lives <= 0 ? 'Try Again' : 'Play Again'}
-                    </StyledButton>
-                </>
-            );
-        }
-    };
-    
-
     return (
-        <div>
-            {gameState === 'idle' && (
-                <StyledButton variant="contained" onClick={startGame}>
-                    Start Game
-                </StyledButton>
-            )}
-            {gameState !== 'idle' && (
-                <GameContainer>
-                    {renderGameScreen()}
-                </GameContainer>
-            )}
-        </div>
+        <ol style={{ fontFamily: '"Cinzel", serif', color: '#333', paddingLeft: '40px' }}>
+            {leaderboard.map((score, index) => (
+                <li key={index} style={{lineHeight: '24px'}}>{formatTime(score)} seconds</li>
+            ))}
+        </ol>
     );
-    
+};
+
+const renderGameScreen = () => {
+    if (gameState === 'playing') {
+        return (
+            <>
+                <StyledGameInfoRow>
+                    <Typography>Timer: {formatTime(timer)}s</Typography>
+                </StyledGameInfoRow>
+                <StyledGameInfoRow>
+                    <Typography>Lives: {renderHealthBar()}</Typography>
+                </StyledGameInfoRow>
+                <GridContainer>{renderGrid()}</GridContainer>
+            </>
+        );
+    } else if (gameState === 'gameOver') {
+        const bestScore = leaderboard.length > 0 ? formatTime(leaderboard[0]) : 'N/A';
+        return (
+            <>
+                <StyledGameInfoRow>
+                    <StyledScoreTypography variant="h5">
+                        {lives <= 0 ? 'Defeat!' : 'Victory!'}
+                    </StyledScoreTypography>
+                    {lives > 0 && <StyledScoreTypography>Your score: {formatTime(timer)}s</StyledScoreTypography>}
+                    <StyledScoreTypography>Best time: {bestScore}{bestScore !== 'N/A' && 's'}</StyledScoreTypography>
+                </StyledGameInfoRow>
+                <StyledScoreTypography variant="h6">Top 5 Times:</StyledScoreTypography>
+                {renderTopScores()}
+                <StyledButton variant="contained" onClick={startGame}>
+                    {lives <= 0 ? 'Try Again' : 'Play Again'}
+                </StyledButton>
+            </>
+        );
+    }
+};
+
+return (
+    <div>
+        {gameState === 'idle' && (
+            <StyledButton variant="contained" onClick={startGame}>
+                Start Game
+            </StyledButton>
+        )}
+        {gameState !== 'idle' && (
+            <GameContainer>
+                {renderGameScreen()}
+            </GameContainer>
+        )}
+    </div>
+);
 };
 
 export default MineSweeperEscape;
