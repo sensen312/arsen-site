@@ -471,7 +471,7 @@ const MineSweeperEscape = () => {
        const bestScore = leaderboard.length > 0 ? leaderboard[0] : 'N/A';
         return (
             <div style={{textAlign: 'center', marginTop: '20px'}}>
-                <StyledScoreTypography variant="h5">{isWin ? 'Escape Successful!' : 'Lost in the Maze!'}</StyledScoreTypography>
+                <StyledScoreTypography variant="h5">{isWin ? 'You swept through the mines!' : 'You got swept bt the mines!'}</StyledScoreTypography>
                 {isWin && <StyledScoreTypography>Your time: {timer}s</StyledScoreTypography>}
                 <StyledScoreTypography>Best time: {bestScore}{bestScore !== 'N/A' && 's'}</StyledScoreTypography>
                 <StyledScoreTypography variant="h6">Top {difficulty} Times:</StyledScoreTypography>
