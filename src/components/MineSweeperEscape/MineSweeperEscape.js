@@ -206,7 +206,6 @@ const MineSweeperEscape = () => {
         setTimer(0);
         setLives(settings.lives);
         setExplodingCell(null);
-        setGameState('idle'); 
 
         const startPos = { x: 0, y: Math.floor(Math.random() * currentGridSize) };
         let endPos = { x: currentGridSize - 1, y: Math.floor(Math.random() * currentGridSize) };
@@ -255,14 +254,14 @@ const MineSweeperEscape = () => {
     }, [difficulty]);
 
     const handleDifficultyChange = (newDifficulty) => {
+        if (difficulty === newDifficulty) return;
         setDifficulty(newDifficulty);
-        startGame(newDifficulty);
+        setGameState('idle');
+        setGrid([]);
+        setTimer(0);
     };
     
-    useEffect(() => {
-        startGame(difficulty);
-    }, []);
-
+    // Removed the useEffect that automatically started the game on mount.
 
     useEffect(() => {
         let interval = null;
@@ -317,20 +316,22 @@ const MineSweeperEscape = () => {
     }, []);
 
     const handleCellClick = useCallback((x, y) => {
-        const gridSize = grid.length;
-        if (gameState !== 'playing' || explodingCell || !grid[y]) return;
+        if (gameState !== 'playing' || explodingCell || !grid[y] || !grid[y][x]) return;
 
         const targetCell = grid[y][x];
 
         const diffX = Math.abs(x - playerPosition.x);
         const diffY = Math.abs(y - playerPosition.y);
         
-        if (diffX + diffY !== 1) {
-             if (targetCell.isRevealed && diffX <=1 && diffY <=1){
-                 setPlayerPosition({x,y});
-            }
+        // This is the condition for a valid move: must be one step away and not diagonal.
+        const isValidMove = diffX + diffY === 1;
+
+        if (!isValidMove) {
+            // If the move is not valid (e.g., diagonal or too far), do nothing.
             return;
         }
+
+        // --- Logic below only executes for valid, orthogonal moves ---
 
         if (targetCell.isBomb && !targetCell.isRevealed) {
             const newLives = lives - 1;
@@ -368,19 +369,21 @@ const MineSweeperEscape = () => {
     
     const handleKeyPress = useCallback((event) => {
         if (gameState !== 'playing') return;
-        let {x, y} = playerPosition;
+        const {x, y} = playerPosition;
         const gridSize = grid.length;
+        let nextX = x, nextY = y;
+
         switch (event.key) {
-            case 'w': case 'ArrowUp': y--; break;
-            case 'a': case 'ArrowLeft': x--; break;
-            case 's': case 'ArrowDown': y++; break;
-            case 'd': case 'ArrowRight': x++; break;
+            case 'w': case 'ArrowUp': nextY--; break;
+            case 'a': case 'ArrowLeft': nextX--; break;
+            case 's': case 'ArrowDown': nextY++; break;
+            case 'd': case 'ArrowRight': nextX++; break;
             default: return;
         }
-        if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
-            handleCellClick(x, y);
+        if (nextX >= 0 && nextX < gridSize && nextY >= 0 && nextY < gridSize) {
+            handleCellClick(nextX, nextY);
         }
-    }, [gameState, playerPosition, grid, handleCellClick]);
+    }, [gameState, playerPosition, grid.length, handleCellClick]);
     
     useEffect(() => {
         window.addEventListener('keydown', handleKeyPress);
@@ -459,8 +462,8 @@ const MineSweeperEscape = () => {
     };
 
     const renderGameOverScreen = () => {
-         const isWin = gameState === 'gameOverWin';
-         const bestScore = leaderboard.length > 0 ? leaderboard[0] : 'N/A';
+       const isWin = gameState === 'gameOverWin';
+       const bestScore = leaderboard.length > 0 ? leaderboard[0] : 'N/A';
         return (
             <div style={{textAlign: 'center', marginTop: '20px'}}>
                 <StyledScoreTypography variant="h5">{isWin ? 'Escape Successful!' : 'Lost in the Maze!'}</StyledScoreTypography>
@@ -499,7 +502,7 @@ const MineSweeperEscape = () => {
                  <>
                     <StyledGameInfoRow>Timer: {timer}s | Lives: {lives}</StyledGameInfoRow>
                     {renderGrid()}
-                </>
+                 </>
             )}
 
             {gameState.startsWith('gameOver') && renderGameOverScreen()}
