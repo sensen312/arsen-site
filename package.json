@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://sensen312.github.io/arsen-site",
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",

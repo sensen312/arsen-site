@@ -5,6 +5,7 @@ import AboutPage from '../../pages/AboutPage';
 import ProjectsPage from '../../pages/ProjectsPage';
 import ResumePage from '../../pages/ResumePage';
 import TableOfContentsPage from '../../pages/TableOfContentsPage';
+import ContactPage from '../../pages/ContactPage'; 
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import JournalBookmark from '../JournalBookmark/JournalBookmark';
@@ -66,6 +67,8 @@ const Journal = () => {
         isBookmark: true,
       },
       { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
+      { path: '/contact', component: ContactPage, title: 'Contact', isBookmark: true },
+
     ];
 
     let pageNumberCounter = 1;

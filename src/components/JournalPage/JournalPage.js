@@ -26,7 +26,7 @@ const StyledTypography = styled(Typography, {
   name: 'JournalPageTitle',
 })(({ theme }) => ({
   borderBottom: '1px solid #bbb',
-
+  fontWeight: 'bold',
   color: theme.palette.primary.main,
   textAlign: 'center',
 }));
