@@ -96,7 +96,6 @@ const StyledScoreTypography = styled(Typography)(({ theme }) => ({
 
 
 
-// Main component
 const MineSweeperEscape = () => {
     const theme = useTheme();
     const navigate = useNavigate();
@@ -111,7 +110,6 @@ const MineSweeperEscape = () => {
     const [lives, setLives] = useState(initialLives);
     const [timer, setTimer] = useState(0);
     const [gameState, setGameState] = useState('idle'); // idle, playing, gameOver
-    const [scores, setScores] = useState([]);
     const [highestScore, setHighestScore] = useState(
         parseInt(localStorage.getItem('highestScore')) || 0
     );
@@ -129,7 +127,6 @@ const MineSweeperEscape = () => {
         setGameState('playing');
         setTimer(0);
         setLives(initialLives);
-        setScores([]);
 
         // Random starting position and exit position
         const randomPosition = () => ({
@@ -174,13 +171,25 @@ const MineSweeperEscape = () => {
     };
 
     const saveScore = (score) => {
+        // This function is only called on victory.
+        if (typeof score !== 'number' || isNaN(score)) {
+            return;
+        }
+    
+        // Update Leaderboard in localStorage
         const savedScores = JSON.parse(localStorage.getItem('scores')) || [];
         savedScores.push(score);
-        savedScores.sort((a, b) => a - b);
-        if (savedScores.length > 5) {
-            savedScores.pop();
+        savedScores.sort((a, b) => a - b); // Sort ascending (lower time is better)
+        const newTopScores = savedScores.slice(0, 5); // Take only the top 5
+        localStorage.setItem('scores', JSON.stringify(newTopScores));
+    
+        // Update the 'highestScore' state, which tracks the best score (lowest time).
+        if (newTopScores.length > 0) {
+            const bestScore = newTopScores[0];
+            // Also update the separate localStorage item for `highestScore` for persistence.
+            localStorage.setItem('highestScore', bestScore.toString());
+            setHighestScore(bestScore);
         }
-        localStorage.setItem('scores', JSON.stringify(savedScores));
     };
 
     const [explode, setExplode] = useState(false);
@@ -248,14 +257,6 @@ const MineSweeperEscape = () => {
         }
         
     };
-
-    
-    
-
-
-    if (gameState === 'gameOver') {
-        saveScore(timer);
-    }
 
     const handleCellClick = (x, y) => {
         if (gameState !== 'playing') return;
@@ -349,14 +350,16 @@ const MineSweeperEscape = () => {
     }
 
     return gridContent;
-    
-        return gridContent;
     };
 
     const renderTopScores = () => {
         const savedScores = JSON.parse(localStorage.getItem('scores')) || [];
+        // Only render if there are scores to display
+        if (savedScores.length === 0) {
+            return <Typography sx={{fontFamily: '"Cinzel", serif', color: '#333', fontStyle: 'italic', lineHeight: '24px',}}>No scores yet. Be the first!</Typography>;
+        }
         return (
-            <ol>
+            <ol style={{ fontFamily: '"Cinzel", serif', color: '#333', lineHeight: '24px', fontSize: '1.3rem' }}>
                 {savedScores.map((score, index) => (
                     <li key={index}>{score}s</li>
                 ))}
@@ -382,15 +385,15 @@ const MineSweeperEscape = () => {
                 <>
                     <StyledGameInfoRow>
                         <StyledScoreTypography variant="h5">
-                            {lives === 0 ? 'Defeat!' : 'Victory!'}
+                            {lives <= 0 ? 'Defeat!' : 'Victory!'}
                         </StyledScoreTypography>
-                        <StyledScoreTypography>Your score: {timer}s</StyledScoreTypography>
+                        {lives > 0 && <StyledScoreTypography>Your score: {timer}s</StyledScoreTypography>}
                         <StyledScoreTypography>Highest score: {highestScore}s</StyledScoreTypography>
                     </StyledGameInfoRow>
-                    <StyledScoreTypography variant="h6">Top 5 Scores:</StyledScoreTypography>
+                    <StyledScoreTypography variant="h6">Top Scores:</StyledScoreTypography>
                     {renderTopScores()}
                     <StyledButton variant="contained" onClick={startGame}>
-                        {lives === 0 ? 'Try Again' : 'Play Again'}
+                        {lives <= 0 ? 'Try Again' : 'Play Again'}
                     </StyledButton>
                 </>
             );

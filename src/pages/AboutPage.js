@@ -12,6 +12,12 @@ const PolaroidImage = styled('img')(({ theme }) => ({
     left: '50%',
     transform: 'translateX(-50%)',
     maxWidth: '60%',
+
+    // --- Mobile Styles ---
+  '@media (max-width: 768px)': {
+    bottom: theme.spacing(2),
+    maxWidth: '60%',
+  },
  
 }));
 

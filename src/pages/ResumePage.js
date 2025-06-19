@@ -8,13 +8,35 @@ const ResumeContainer = styled('div')({
   lineHeight: '24px',
   width: '99%',
   height: '90%', 
-
   fontSize: '57%',
 
   '@media (min-width:600px)': {
     fontSize: '70%',
   },
+  
+  // Mobile-specific styles for scrolling
+  '@media (max-width: 600px)': {
+    overflowY: 'auto', 
+    paddingRight: '10px', 
+
+    // Custom scrollbar styling
+    '&::-webkit-scrollbar': {
+      width: '8px',
+    },
+    '&::-webkit-scrollbar-track': {
+      background: '#f8f0e3', 
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#987652', 
+      borderRadius: '4px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+      background: '#876541',
+    },
+  },
 });
+
+
 const FlexHeader = styled('div')({
     display: 'flex',
     justifyContent: 'space-between',
