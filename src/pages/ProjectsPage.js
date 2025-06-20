@@ -15,14 +15,14 @@ const ProjectsContentContainer = styled('div')({
       width: '8px',
     },
     '&::-webkit-scrollbar-track': {
-      background: '#f8f0e3', 
+      background: '#F8F0E3', 
     },
     '&::-webkit-scrollbar-thumb': {
-      backgroundColor: '#987652', 
+      backgroundColor: '#F8F0E3', 
       borderRadius: '4px',
     },
     '&::-webkit-scrollbar-thumb:hover': {
-      background: '#876541',
+      background: '#F8F0E3',
     },
   },
 });
