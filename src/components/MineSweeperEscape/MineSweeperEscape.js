@@ -13,7 +13,7 @@ const GameContainer = styled(Paper)(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     position: 'relative',
-    paddingTop: theme.spacing(1),
+    paddingTop: theme.spacing(0),
     minHeight: '450px',
 }));
 
@@ -56,7 +56,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
 const DifficultySelector = styled('div')({
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: '10px',
 });
 
 const DifficultyButton = styled(Button)(({ theme, selected }) => ({
@@ -82,7 +81,7 @@ const GridContainer = styled('div')(({ gridSize }) => ({
     border: '2px solid #987652',
     borderRadius: '5px',
     backgroundColor: '#c9b89c',
-    padding: '5px',
+    padding: '1px',
     boxShadow: 'inset 0 0 10px rgba(0,0,0,0.2)',
 }));
 
@@ -165,7 +164,7 @@ const StyledGameInfoRow = styled('div')({
     color: '#333',
     fontWeight: 'bold',
     fontSize: '1.2rem',
-    marginBottom: '10px',
+    marginBottom: 'px',
 });
 
 const StyledScoreTypography = styled(Typography)({
