@@ -17,7 +17,7 @@ const StyledJournalPage = styled(Paper, {
   flexDirection: 'column',
   justifyContent: isCover ? 'center' : 'flex-start',
   width: '100%',
- 
+  fontSize: '1.3rem',
   zIndex: 2, 
 }));
 
@@ -29,6 +29,7 @@ const StyledTypography = styled(Typography, {
   fontWeight: 'bold',
   color: theme.palette.primary.main,
   textAlign: 'center',
+  fontSize: '2rem',
 }));
 
 const ContentArea = styled('div', {

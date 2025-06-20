@@ -37,6 +37,7 @@ const StyledJournalContainer = styled(Box, {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  fontSize: '23px',
 
   // --- Mobile Styles ---
   '@media (max-width: 768px)': {

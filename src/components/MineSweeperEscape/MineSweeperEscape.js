@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import { Paper, Button, Typography, Switch, FormControlLabel } from '@mui/material';
 
@@ -220,6 +220,9 @@ const MineSweeperEscape = () => {
     const [leaderboard, setLeaderboard] = useState([]);
     const [explodingCell, setExplodingCell] = useState(null);
     
+    // SOLUS FIX: Ref to hold a timer to distinguish single/double clicks.
+    const clickTimeout = useRef(null);
+    
     const startGame = useCallback((diff) => {
         const currentDifficulty = diff || difficulty;
         const settings = difficultySettings[currentDifficulty];
@@ -324,18 +327,17 @@ const MineSweeperEscape = () => {
 
         for (let dy = -1; dy <= 1; dy++) {
             for (let dx = -1; dx <= 1; dx++) {
-                if(dx === 0 && dy === 0) continue;
                 const nx = clearedBomb.x + dx;
                 const ny = clearedBomb.y + dy;
 
                 if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
                     let newBombCount = 0;
-                     for (let dy2 = -1; dy2 <= 1; dy2++) {
+                    for (let dy2 = -1; dy2 <= 1; dy2++) {
                         for (let dx2 = -1; dx2 <= 1; dx2++) {
                             if (dx2 === 0 && dy2 === 0) continue;
                             const nnx = nx + dx2;
                             const nny = ny + dy2;
-                             if (nnx >= 0 && nnx < gridSize && nny >= 0 && nny < gridSize && gridCopy[nny][nnx].isBomb) {
+                            if (nnx >= 0 && nnx < gridSize && nny >= 0 && nny < gridSize && gridCopy[nny][nnx].isBomb) {
                                 newBombCount++;
                             }
                         }
@@ -346,37 +348,17 @@ const MineSweeperEscape = () => {
         }
         return gridCopy;
     }, []);
-
-    const handleCellClick = useCallback((x, y) => {
+    
+    // SOLUS FIX: Function to handle the logic for moving the player.
+    const executeMove = useCallback((x, y) => {
         if (gameState !== 'playing' || explodingCell || !grid[y]?.[x]) return;
 
         const targetCell = grid[y][x];
-
-        if (isFlaggingMode) {
-            if (!targetCell.isRevealed) {
-                const newGrid = grid.map(row => row.map(cell => 
-                    (cell.x === x && cell.y === y) ? { ...cell, isFlagged: !cell.isFlagged } : cell
-                ));
-                setGrid(newGrid);
-            } else {
-                const diffX = Math.abs(x - playerPosition.x);
-                const diffY = Math.abs(y - playerPosition.y);
-                if (diffX + diffY === 1) { 
-                    setPlayerPosition({ x, y });
-                    if (x === exitPosition.x && y === exitPosition.y) {
-                        setGameState('gameOverWin');
-                    }
-                }
-            }
-            return;
-        }
-
         const diffX = Math.abs(x - playerPosition.x);
         const diffY = Math.abs(y - playerPosition.y);
         const isValidMove = diffX + diffY === 1;
 
-        if (!isValidMove) return;
-        if (targetCell.isFlagged) return;
+        if (!isValidMove || targetCell.isFlagged) return;
 
         if (targetCell.isBomb && !targetCell.isRevealed) {
             const newLives = lives - 1;
@@ -406,8 +388,40 @@ const MineSweeperEscape = () => {
                  setGameState('gameOverWin');
              }
         }
-    }, [gameState, explodingCell, grid, playerPosition, lives, recalculateHints, exitPosition.x, exitPosition.y, isFlaggingMode]);
-    
+    }, [gameState, explodingCell, grid, playerPosition, lives, recalculateHints, exitPosition]);
+
+    // SOLUS FIX: Function to handle flagging a tile.
+    const toggleFlag = (x, y) => {
+         if (gameState === 'playing' && grid[y]?.[x] && !grid[y][x].isRevealed) {
+            const newGrid = grid.map(row => row.map(cell => 
+                (cell.x === x && cell.y === y) ? { ...cell, isFlagged: !cell.isFlagged } : cell
+            ));
+            setGrid(newGrid);
+        }
+    };
+
+    // SOLUS FIX: A unified handler to manage click vs. double-click.
+    // This is NOT memoized with useCallback to ensure it always has the latest state.
+    const handleCellInteraction = (x, y) => {
+        // If a timer is running, we have a double-click.
+        if (clickTimeout.current) {
+            clearTimeout(clickTimeout.current);
+            clickTimeout.current = null;
+            toggleFlag(x, y); // Double-click always toggles flag.
+            return;
+        }
+
+        // Otherwise, it's a single click. Set a timer.
+        clickTimeout.current = setTimeout(() => {
+            clickTimeout.current = null;
+            if (isFlaggingMode) {
+                toggleFlag(x, y); // In flag mode, single-click also toggles flag.
+            } else {
+                executeMove(x, y); // Default action is to move.
+            }
+        }, 250); // 250ms window to detect a double-click.
+    };
+
     const handleKeyPress = useCallback((event) => {
         if (gameState !== 'playing') return;
         const {x, y} = playerPosition;
@@ -423,17 +437,14 @@ const MineSweeperEscape = () => {
         }
 
         if (nextX >= 0 && nextX < gridSize && nextY >= 0 && nextY < gridSize) {
-            const targetCell = grid[nextY][nextX];
-            if(isFlaggingMode && !targetCell.isRevealed) {
-                const newGrid = grid.map(row => row.map(cell => 
-                    (cell.x === nextX && cell.y === nextY) ? { ...cell, isFlagged: !cell.isFlagged } : cell
-                ));
-                setGrid(newGrid);
+             // Keyboard input is unambiguous, so it directly executes a move or flag.
+            if(isFlaggingMode) {
+                toggleFlag(nextX, nextY);
             } else {
-                 handleCellClick(nextX, nextY);
+                 executeMove(nextX, nextY);
             }
         }
-    }, [gameState, playerPosition, grid, handleCellClick, isFlaggingMode]);
+    }, [gameState, playerPosition, grid.length, isFlaggingMode, executeMove]);
     
     useEffect(() => {
         window.addEventListener('keydown', handleKeyPress);
@@ -463,7 +474,7 @@ const MineSweeperEscape = () => {
             mainContent = '👑';
         } else if (isRevealed) {
             styleType = 'path';
-            mainContent = '';
+            mainContent = adjacentBombs > 0 ? adjacentBombs : '';
         } else {
             styleType = 'hidden';
             if (isAdjacentToPath && adjacentBombs > 0) {
@@ -489,7 +500,7 @@ const MineSweeperEscape = () => {
                             <GridCell
                                 key={index}
                                 cellState={{ type: styleType, number: number }}
-                                onClick={() => handleCellClick(cell.x, cell.y)}
+                                onClick={() => handleCellInteraction(cell.x, cell.y)}
                             >
                                 {mainContent}
                                 {overlayContent && (
@@ -525,9 +536,9 @@ const MineSweeperEscape = () => {
     };
 
     const renderGameOverScreen = () => {
-       const isWin = gameState === 'gameOverWin';
-       const bestScore = leaderboard.length > 0 ? leaderboard[0] : 'N/A';
-        return (
+      const isWin = gameState === 'gameOverWin';
+      const bestScore = leaderboard.length > 0 ? leaderboard[0] : 'N/A';
+       return (
             <div style={{textAlign: 'center', marginTop: '20px'}}>
                 <StyledScoreTypography variant="h5">{isWin ? 'Escape Successful!' : 'Lost in the Maze!'}</StyledScoreTypography>
                 {isWin && <StyledScoreTypography>Your time: {timer}s</StyledScoreTypography>}
@@ -535,10 +546,10 @@ const MineSweeperEscape = () => {
                 <StyledScoreTypography variant="h6">Top {difficulty} Times:</StyledScoreTypography>
                 {renderTopScores()}
                  <StyledButton onClick={() => startGame(difficulty)}>
-                    Play Again
+                     Play Again
                  </StyledButton>
             </div>
-        );
+       );
     }
 
     return (

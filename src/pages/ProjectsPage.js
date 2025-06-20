@@ -30,7 +30,7 @@ const ProjectsContentContainer = styled('div')({
 const ProjectsPage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
     const [isWritingFinished, setIsWritingFinished] = useState(false);
 
-    const message = `Hi welcome to the start of my projects page! Currently still expanding this section, but in the meantime how about you try my game: Minesweeper escape! Move up down left and right and try and avoid bombs using the hints.`;
+    const message = `Project page in progress but try playing Minesweeper Escape! Move up down left and right and try and avoid bombs using the hints. Flag tiles using double click or the toggle; you cannot move on flagged tiles. The maze always has a solution so keep trying!`;
 
     const handleWritingFinish = useCallback(() => {
         setIsWritingFinished(true);

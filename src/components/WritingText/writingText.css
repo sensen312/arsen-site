@@ -12,7 +12,7 @@
 
 .quill-cursor {
   display: inline-block;
-  font-size: 2.2rem; /* Adjust size as needed */
+  font-size: 2rem; /* Adjust size as needed */
   animation: quill-bob 0.8s ease-in-out infinite;
   color: #333;
   /* Position will be handled by the component's style prop */
