@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
-import { Paper, Button, Typography } from '@mui/material';
+import { Paper, Button, Typography, Switch, FormControlLabel } from '@mui/material';
 
 
 const GameContainer = styled(Paper)(({ theme }) => ({
@@ -16,6 +16,20 @@ const GameContainer = styled(Paper)(({ theme }) => ({
     paddingTop: theme.spacing(1),
     minHeight: '450px',
 }));
+
+const ControlsWrapper = styled('div')({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    marginTop: '10px',
+});
+
+const ToggleContainer = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+});
 
 const StyledButton = styled(Button)(({ theme }) => ({
     fontFamily: '"Press Start 2P", sans-serif',
@@ -86,8 +100,16 @@ const PlayerIcon = styled('div')({
     zIndex: 10,
 });
 
+const FlagOverlay = styled('span')({
+    position: 'absolute',
+    fontSize: '18px',
+    opacity: 0.8,
+    pointerEvents: 'none',
+});
+
 const GridCell = styled('div')(({ theme, cellState }) => {
     const baseStyles = {
+        position: 'relative', 
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -143,7 +165,7 @@ const StyledGameInfoRow = styled('div')({
     color: '#333',
     fontWeight: 'bold',
     fontSize: '1.2rem',
-    marginBottom: '3px',
+    marginBottom: '10px',
 });
 
 const StyledScoreTypography = styled(Typography)({
@@ -180,14 +202,15 @@ const generateSolvablePath = (gridSize, start, end) => {
 };
 
 const difficultySettings = {
-    Easy: { size: 5, lives: 10 },
-    Medium: { size: 7, lives: 5 },
-    Hard: { size: 9, lives: 2 }
+    Easy: { size: 5, lives: 20 },
+    Medium: { size: 7, lives: 10 },
+    Hard: { size: 9, lives: 5 }
 };
 
 
 const MineSweeperEscape = () => {
     const [difficulty, setDifficulty] = useState('Easy');
+    const [isFlaggingMode, setIsFlaggingMode] = useState(false);
     
     const [grid, setGrid] = useState([]);
     const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
@@ -206,6 +229,7 @@ const MineSweeperEscape = () => {
         setTimer(0);
         setLives(settings.lives);
         setExplodingCell(null);
+        setIsFlaggingMode(false);
 
         let startPos, endPos, solutionPath;
         const minDistance = 3;
@@ -222,10 +246,10 @@ const MineSweeperEscape = () => {
 
             const distance = Math.abs(startPos.x - endPos.x) + Math.abs(startPos.y - endPos.y);
 
-            if (distance > minDistance) {
+            if (distance > minDistance && (startPos.x !== endPos.x || startPos.y !== endPos.y)) {
                 solutionPath = generateSolvablePath(currentGridSize, startPos, endPos);
             } else {
-                solutionPath = []; // Force a retry if distance is too small
+                solutionPath = []; 
             }
 
         } while (solutionPath.length === 0);
@@ -238,7 +262,7 @@ const MineSweeperEscape = () => {
         let newGrid = Array.from({ length: currentGridSize }, (_, y) =>
             Array.from({ length: currentGridSize }, (_, x) => ({
                 x, y, isBomb: !solutionCoords.has(`${x},${y}`), 
-                isRevealed: false, adjacentBombs: 0 
+                isRevealed: false, adjacentBombs: 0, isFlagged: false
             }))
         );
         
@@ -325,18 +349,35 @@ const MineSweeperEscape = () => {
     }, []);
 
     const handleCellClick = useCallback((x, y) => {
-        if (gameState !== 'playing' || explodingCell || !grid[y] || !grid[y][x]) return;
+        if (gameState !== 'playing' || explodingCell || !grid[y]?.[x]) return;
 
         const targetCell = grid[y][x];
 
-        const diffX = Math.abs(x - playerPosition.x);
-        const diffY = Math.abs(y - playerPosition.y);
-        
-        const isValidMove = diffX + diffY === 1;
-
-        if (!isValidMove) {
+        if (isFlaggingMode) {
+            if (!targetCell.isRevealed) {
+                const newGrid = grid.map(row => row.map(cell => 
+                    (cell.x === x && cell.y === y) ? { ...cell, isFlagged: !cell.isFlagged } : cell
+                ));
+                setGrid(newGrid);
+            } else {
+                const diffX = Math.abs(x - playerPosition.x);
+                const diffY = Math.abs(y - playerPosition.y);
+                if (diffX + diffY === 1) { 
+                    setPlayerPosition({ x, y });
+                    if (x === exitPosition.x && y === exitPosition.y) {
+                        setGameState('gameOverWin');
+                    }
+                }
+            }
             return;
         }
+
+        const diffX = Math.abs(x - playerPosition.x);
+        const diffY = Math.abs(y - playerPosition.y);
+        const isValidMove = diffX + diffY === 1;
+
+        if (!isValidMove) return;
+        if (targetCell.isFlagged) return;
 
         if (targetCell.isBomb && !targetCell.isRevealed) {
             const newLives = lives - 1;
@@ -347,16 +388,12 @@ const MineSweeperEscape = () => {
                 let gridAfterExplosion = grid.map(row => row.map(cell => 
                     (cell.x === x && cell.y === y) ? {...cell, isBomb: false, isRevealed: true} : cell
                 ));
-                
                 const finalGrid = recalculateHints(gridAfterExplosion, {x, y});
-
                 setGrid(finalGrid);
                 setPlayerPosition({ x, y });
                 setExplodingCell(null);
                 
-                if (newLives <= 0) {
-                    setGameState('gameOverLoss');
-                }
+                if (newLives <= 0) setGameState('gameOverLoss');
             }, 400);
             return;
         }
@@ -370,7 +407,7 @@ const MineSweeperEscape = () => {
                  setGameState('gameOverWin');
              }
         }
-    }, [gameState, explodingCell, grid, playerPosition, lives, recalculateHints, exitPosition.x, exitPosition.y]);
+    }, [gameState, explodingCell, grid, playerPosition, lives, recalculateHints, exitPosition.x, exitPosition.y, isFlaggingMode]);
     
     const handleKeyPress = useCallback((event) => {
         if (gameState !== 'playing') return;
@@ -385,10 +422,19 @@ const MineSweeperEscape = () => {
             case 'd': case 'ArrowRight': nextX++; break;
             default: return;
         }
+
         if (nextX >= 0 && nextX < gridSize && nextY >= 0 && nextY < gridSize) {
-            handleCellClick(nextX, nextY);
+            const targetCell = grid[nextY][nextX];
+            if(isFlaggingMode && !targetCell.isRevealed) {
+                const newGrid = grid.map(row => row.map(cell => 
+                    (cell.x === nextX && cell.y === nextY) ? { ...cell, isFlagged: !cell.isFlagged } : cell
+                ));
+                setGrid(newGrid);
+            } else {
+                 handleCellClick(nextX, nextY);
+            }
         }
-    }, [gameState, playerPosition, grid.length, handleCellClick]);
+    }, [gameState, playerPosition, grid, handleCellClick, isFlaggingMode]);
     
     useEffect(() => {
         window.addEventListener('keydown', handleKeyPress);
@@ -396,30 +442,40 @@ const MineSweeperEscape = () => {
     }, [handleKeyPress]);
 
     const getCellDisplayInfo = (cell) => {
-        const { x, y, isBomb, isRevealed, adjacentBombs } = cell;
+        const { x, y, isBomb, isRevealed, adjacentBombs, isFlagged } = cell;
 
         const revealedCells = grid.flat().filter(c => c.isRevealed);
         const isAdjacentToPath = revealedCells.some(rc => 
             Math.abs(x - rc.x) <= 1 && Math.abs(y - rc.y) <= 1
         );
         
-        if (explodingCell && explodingCell.x === x && explodingCell.y === y) {
-            return { styleType: 'bomb', content: '💥' };
-        }
-        if (gameState === 'gameOverLoss' && isBomb && !isRevealed) {
-            return { styleType: 'bomb', content: '💣' };
-        }
-        if (x === exitPosition.x && y === exitPosition.y) {
-             return { styleType: 'hidden', content: '🚩' };
-        }
-        if (isRevealed) {
-            return { styleType: 'path', content: '' };
-        }
-        if (isAdjacentToPath && !isRevealed) {
-            return { styleType: 'hidden', content: adjacentBombs > 0 ? adjacentBombs : '' };
-        }
+        let styleType = 'hidden';
+        let mainContent = null;
+        let overlayContent = null;
 
-        return { styleType: 'hidden', content: '' };
+        if (explodingCell && explodingCell.x === x && explodingCell.y === y) {
+            styleType = 'bomb';
+            mainContent = '💥';
+        } else if (gameState === 'gameOverLoss' && isBomb && !isRevealed) {
+            styleType = 'bomb';
+            mainContent = '💣';
+        } else if (x === exitPosition.x && y === exitPosition.y) {
+            styleType = 'hidden';
+            mainContent = '👑';
+        } else if (isRevealed) {
+            styleType = 'path';
+            mainContent = '';
+        } else {
+            styleType = 'hidden';
+            if (isAdjacentToPath && adjacentBombs > 0) {
+                mainContent = adjacentBombs;
+            }
+            if (isFlagged) {
+                overlayContent = '🚩';
+            }
+        }
+        
+        return { styleType, mainContent, overlayContent, number: adjacentBombs };
     };
     
     const renderGrid = () => {
@@ -429,14 +485,17 @@ const MineSweeperEscape = () => {
             <GridWrapper>
                 <GridContainer gridSize={currentGridSize}>
                     {grid.flat().map((cell, index) => {
-                        const { styleType, content } = getCellDisplayInfo(cell);
+                        const { styleType, mainContent, overlayContent, number } = getCellDisplayInfo(cell);
                         return (
                             <GridCell
                                 key={index}
-                                cellState={{ type: styleType, number: cell.adjacentBombs }}
+                                cellState={{ type: styleType, number: number }}
                                 onClick={() => handleCellClick(cell.x, cell.y)}
                             >
-                                {content}
+                                {mainContent}
+                                {overlayContent && (
+                                    <FlagOverlay>{overlayContent}</FlagOverlay>
+                                )}
                             </GridCell>
                         );
                     })}
@@ -471,7 +530,7 @@ const MineSweeperEscape = () => {
        const bestScore = leaderboard.length > 0 ? leaderboard[0] : 'N/A';
         return (
             <div style={{textAlign: 'center', marginTop: '20px'}}>
-                <StyledScoreTypography variant="h5">{isWin ? 'You swept through the mines!' : 'You got swept bt the mines!'}</StyledScoreTypography>
+                <StyledScoreTypography variant="h5">{isWin ? 'Escape Successful!' : 'Lost in the Maze!'}</StyledScoreTypography>
                 {isWin && <StyledScoreTypography>Your time: {timer}s</StyledScoreTypography>}
                 <StyledScoreTypography>Best time: {bestScore}{bestScore !== 'N/A' && 's'}</StyledScoreTypography>
                 <StyledScoreTypography variant="h6">Top {difficulty} Times:</StyledScoreTypography>
@@ -504,10 +563,19 @@ const MineSweeperEscape = () => {
             )}
 
             {gameState === 'playing' && grid.length > 0 && (
-                 <>
+                <>
                     <StyledGameInfoRow>Timer: {timer}s | ❤️ Lives: {lives}</StyledGameInfoRow>
                     {renderGrid()}
-                 </>
+                    <ControlsWrapper>
+                        <ToggleContainer>
+                            <FormControlLabel
+                                control={<Switch checked={isFlaggingMode} onChange={() => setIsFlaggingMode(!isFlaggingMode)} color="primary" />}
+                                label="🚩 Mark Mode"
+                            />
+                            {isFlaggingMode && <Typography variant="caption" sx={{fontFamily: '"Press Start 2P", sans-serif', fontSize: '0.6rem'}}>Click to mark tiles</Typography>}
+                        </ToggleContainer>
+                    </ControlsWrapper>
+                </>
             )}
 
             {gameState.startsWith('gameOver') && renderGameOverScreen()}

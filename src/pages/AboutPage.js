@@ -8,14 +8,14 @@ import SEO from '../components/SEO/SEO';
 
 const PolaroidImage = styled('img')(({ theme }) => ({
     position: 'absolute',
-    bottom: theme.spacing(15),
+    bottom: theme.spacing(5),
     left: '50%',
     transform: 'translateX(-50%)',
     maxWidth: '60%',
 
     // --- Mobile Styles ---
   '@media (max-width: 768px)': {
-    bottom: theme.spacing(2),
+    bottom: theme.spacing(1),
     maxWidth: '60%',
   },
  
