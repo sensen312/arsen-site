@@ -8,7 +8,6 @@ import SEO from '../components/SEO/SEO';
 
 const StyledHomePage = styled('div')(({ theme }) => ({
   textAlign: 'center',
-  fontFamily: '"Permanent Marker", cursive',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -20,26 +19,24 @@ const StyledHomePage = styled('div')(({ theme }) => ({
   zIndex: 1,
   backgroundImage: `url(${backgroundImage})`,
   backgroundSize: 'cover',
-  backgroundPosition: 'center',
+  
   backgroundRepeat: 'no-repeat',
   borderRadius: '12px',
   boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5), 10px 10px 30px rgba(0, 0, 0, 0.5)',
 }));
 
 const StyledTitle = styled(Typography)(({ theme }) => ({
-  width: '80%',
-  fontSize: `calc(7vh)`,
-  letterSpacing: 1.5,
+  margin: '-20rem 0 0 auto',
+  width: '85%',
+  fontSize: `calc(5vh)`,
   color: 'black',
   textShadow: '2px 1px 1px rgba(74, 23, 23, 0.5)',
-  fontFamily: '"Permanent Marker"',
 }));
 
 const StyledSubtitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(3),
   fontSize: `calc(6vh)`, 
   color: 'black',
-  fontFamily: '"Permanent Marker"',
 }));
 
 const StyledLogo = styled('img')(({ theme }) => ({
@@ -59,7 +56,7 @@ const HomePage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
                 <StyledSubtitle variant="h5">
                     Journal I
                 </StyledSubtitle>
-                <StyledLogo src={logo} alt="Logo" />
+                {/*<StyledLogo src={logo} alt="Logo" />*/}
             </StyledHomePage>
         </JournalPage>
     );
