@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/system';
 import './typingText.css';
 console.log('typingText.js');
-// creates a perfect match for the lined paper background
+
 const TypingContainer = styled('div')(({ theme }) => ({
   fontFamily: '"Cinzel", serif',
   color: '#333',
