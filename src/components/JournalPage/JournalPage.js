@@ -1,106 +1,95 @@
 import React from 'react';
-import { Paper, Typography, IconButton } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { IconButton } from '@mui/material';
 import { ArrowForward, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { styled } from '@mui/system';
-import zIndex from '@mui/material/styles/zIndex';
 
-const StyledJournalPage = styled(Paper, {
-  name: 'JournalPage',
-})(({ theme, isCover }) => ({
+const JournalPageWrapper = styled('div')(({ theme, side }) => ({
+  backgroundColor: theme.colors.paper,
+  width: '100%',
   height: '100%',
-  backgroundColor: isCover ? 'transparent' : '#f8f0e3',
-  border: isCover ? 'none' : '1px solid #f8f0e3',
-  boxShadow: isCover ? 'none' : 'inset 0 0 10px #987652',
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: isCover ? 'center' : 'flex-start',
-  width: '100%',
-  fontSize: '1.3rem',
-  zIndex: 2, 
+  boxShadow: 'inset 0 0 20px rgba(0,0,0,0.15)',
+  padding: '2.5em',
+  borderRadius: side === 'left' ? '8px 0 0 8px' : '0 8px 8px 0',
+  overflow: 'hidden',
+
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: '1px',
+    backgroundColor: theme.colors.marginLine,
+    left: side === 'left' ? `calc(100% - ${theme.proportions.pageMarginLineLeft})` : theme.proportions.pageMarginLineLeft,
+  },
 }));
 
-
-const StyledTypography = styled(Typography, {
-  name: 'JournalPageTitle',
-})(({ theme }) => ({
-  borderBottom: '1px solid #bbb',
-  fontWeight: 'bold',
-  color: theme.palette.primary.main,
-  textAlign: 'center',
-  fontSize: '2rem',
+const PageHeader = styled('h1')(({ theme, side }) => ({
+  fontFamily: theme.fonts.heading,
+  color: theme.colors.ink,
+  fontSize: 'clamp(1.8rem, 4vh, 2.5rem)',
+  minHeight: `calc(${theme.page.lineHeight} * 2)`,
+  margin: 0,
+  display: 'flex',
+  alignItems: 'center',
+  borderBottom: `1px solid ${theme.colors.line}`,
+  marginBottom: '0.5em',
+  paddingLeft: side !== 'left' ? theme.proportions.pageContentPaddingLeft : '0',
+  paddingRight: side === 'left' ? theme.proportions.pageContentPaddingLeft : '0',
 }));
 
-const ContentArea = styled('div', {
-  name: 'JournalContentArea',
-})(({ theme, isCover }) => ({
+const PageBody = styled('div')(({ theme, side }) => ({
   flexGrow: 1,
-  overflowY: 'hidden', 
-  background: isCover
-    ? 'none'
-    : 'repeating-linear-gradient(#f8f0e3, #f8f0e3 23px, #000 24px)',
-  width: '100%',
-  color: theme.palette.primary.main,
-  zIndex: 2,
+  lineHeight: theme.page.lineHeight,
+  backgroundImage: `repeating-linear-gradient(to bottom, transparent, transparent calc(${theme.page.lineHeight} - 1px), ${theme.colors.line} calc(${theme.page.lineHeight} - 1px), ${theme.colors.line} ${theme.page.lineHeight})`,
+  backgroundSize: `100% ${theme.page.lineHeight}`,
+  backgroundPosition: '0 -0.2em',
+  paddingLeft: side !== 'left' ? theme.proportions.pageContentPaddingLeft : '0',
+  paddingRight: side === 'left' ? theme.proportions.pageContentPaddingLeft : '0',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    display: 'none', // Invisible scrollbar
+  },
+  msOverflowStyle: 'none', // for IE and Edge
+  scrollbarWidth: 'none', // for Firefox
 }));
 
-const ArrowButton = styled(IconButton, {
-  name: 'ArrowButton',
-})(({ theme, direction }) => ({
-  position: 'absolute',
-  bottom: theme.spacing(2),
-  backgroundColor: 'none',
-  color: 'white',
-  boxShadow: '2px 2px 0px 1px rgba(0, 0, 0, 0.1)',
-  
-  // Desktop styles
-  right: direction === 'forward' ? theme.spacing(-10) : undefined,
-  left: direction === 'back' ? theme.spacing(-10) : undefined,
+const PageContent = styled('div')(({ theme }) => ({
+  fontFamily: theme.fonts.body,
+  color: theme.colors.ink,
+  fontSize: theme.page.fontSize,
+  'p': { margin: 0 },
+}));
 
-  '&:hover': {
-    backgroundColor: '#e0d7c9',
-    boxShadow: '2px 2px 0px 1px rgba(0, 0, 0, 0.2)',
-  },
-  '& svg': {
-    fontSize: '3.5rem',
-  },
+const PageNumber = styled('div')(({ theme, side }) => ({
+    position: 'absolute',
+    bottom: '1em',
+    fontFamily: theme.fonts.heading,
+    color: theme.colors.ink,
+    fontSize: '1rem',
+    right: side !== 'left' ? '1.5em' : 'auto',
+    left: side === 'left' ? '1.5em' : 'auto',
+}));
 
-  // Mobile styles
-  '@media (max-width: 768px)': {
-    backgroundColor: 'none',
-    color: 'white',
-    zIndex: 5,
-    right: direction === 'forward' ? theme.spacing(2) : undefined,
-    left: direction === 'back' ? theme.spacing(2) : undefined,
-    
-    bottom: theme.spacing(-8),
-    '& svg': {
-        fontSize: '3rem', 
+const ArrowButton = styled(IconButton)(({ theme, direction }) => ({
+    position: 'absolute',
+    bottom: '1rem',
+    color: theme.colors.cover.base,
+    zIndex: 10,
+    right: direction === 'forward' ? '1rem' : 'auto',
+    left: direction === 'back' ? '1rem' : 'auto',
+    '&:hover': {
+        backgroundColor: 'rgba(0,0,0,0.1)',
     },
-  },
+    '& svg': {
+        fontSize: '3rem',
+    },
 }));
 
-const PageNumber = styled(Typography, {
-  name: 'PageNumber',
-})(({ theme }) => ({
-  position: 'absolute',
-  fontWeight: 'bold',
-  right: theme.spacing(3),
-  bottom: theme.spacing(0.9),
-  color: theme.palette.primary.main,
-  fontSize: '2rem',
-  zIndex: 5,
-}));
-
-const JournalPage = ({
-  title,
-  children,
-  nextPage,
-  prevPage,
-  isCover = false,
-  pageNumber,
-}) => {
+const JournalPage = ({ title, children, pageNumber, side, showNav, nextPage, prevPage }) => {
   const navigate = useNavigate();
 
   const handleNavigation = (pageDirection) => {
@@ -111,41 +100,23 @@ const JournalPage = ({
   };
 
   return (
-    <StyledJournalPage isCover={isCover} className="journal-page">
-      {!isCover && (
-        <StyledTypography
-          variant="h5"
-          component="h2"
-          className="journal-page-title"
-        >
-          {title}
-        </StyledTypography>
+    <JournalPageWrapper side={side}>
+      <PageHeader side={side}>{title}</PageHeader>
+      <PageBody side={side}>
+        <PageContent>{children}</PageContent>
+      </PageBody>
+      {pageNumber && <PageNumber side={side}>{pageNumber}</PageNumber>}
+      {showNav && nextPage && (
+          <ArrowButton direction="forward" onClick={() => handleNavigation('next')}>
+              <ArrowForward />
+          </ArrowButton>
       )}
-      <ContentArea isCover={isCover} className="journal-content-area">
-        {children}
-      </ContentArea>
-      {!isCover && pageNumber && (
-        <PageNumber className="page-number">{pageNumber}</PageNumber>
+      {showNav && prevPage && (
+          <ArrowButton direction="back" onClick={() => handleNavigation('prev')}>
+              <ArrowBack />
+          </ArrowButton>
       )}
-      {nextPage && (
-        <ArrowButton
-          direction="forward"
-          onClick={() => handleNavigation('next')}
-          className="arrow-button-forward"
-        >
-          <ArrowForward />
-        </ArrowButton>
-      )}
-      {prevPage && (
-        <ArrowButton
-          direction="back"
-          onClick={() => handleNavigation('prev')}
-          className="arrow-button-back"
-        >
-          <ArrowBack />
-        </ArrowButton>
-      )}
-    </StyledJournalPage>
+    </JournalPageWrapper>
   );
 };
 

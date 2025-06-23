@@ -1,57 +1,62 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import JournalPage from '../components/JournalPage/JournalPage';
-import WritingText from '../components/WritingText/WritingText';
-import MineSweeperEscape from '../components/MineSweeperEscape/MineSweeperEscape';
 import SEO from '../components/SEO/SEO';
-import { styled } from '@mui/system';
+import MineSweeperEscape from '../components/MineSweeperEscape/MineSweeperEscape';
+import { useMediaQuery } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import WritingText from '../components/WritingText/WritingText';
 
-const ProjectsContentContainer = styled('div')({
+const PageSpreadContainer = styled('div')({
+  display: 'flex',
   width: '100%',
-  
-  '@media (max-width: 600px)': {
-    overflowY: 'auto', 
-    paddingRight: '10px', 
-    '&::-webkit-scrollbar': {
-      width: '8px',
-    },
-    '&::-webkit-scrollbar-track': {
-      background: '#F8F0E3', 
-    },
-    '&::-webkit-scrollbar-thumb': {
-      backgroundColor: '#F8F0E3', 
-      borderRadius: '4px',
-    },
-    '&::-webkit-scrollbar-thumb:hover': {
-      background: '#F8F0E3',
-    },
-  },
+  height: '100%',
+  boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
 });
 
-const ProjectsPage = ({ nextPage, prevPage, pageNumber, isBookmark }) => {
-    const [isWritingFinished, setIsWritingFinished] = useState(false);
+const ProjectsPage = ({ nextPage, prevPage, pageNumber }) => {
+    const theme = useTheme();
+    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
-    const message = `Project page in progress but try playing Minesweeper Escape! Move up down left and right and try and avoid bombs using the hints. Flag tiles using double click or the toggle; you cannot move on flagged tiles. The maze always has a solution so keep trying!`;
-
-    const handleWritingFinish = useCallback(() => {
-        setIsWritingFinished(true);
-    }, []);
-
-    isBookmark = true;
+    const content1 = (
+        <WritingText
+            message="Project page in progress but try playing Minesweeper Escape! Move with WASD or arrows and try and avoid bombs using the hints. Flag tiles using double click or the toggle."
+            repeat={true}
+        />
+    );
+    
+    const content2 = (
+        <>
+            <WritingText
+                message="The maze always has a solution so keep trying! Your best times are saved locally for each difficulty."
+                repeat={true}
+            />
+            <MineSweeperEscape />
+        </>
+    );
 
     return (
         <>
-            <SEO 
+            <SEO
                 title="Projects | Arsen Aldea's Portfolio Site"
                 description="Explore the projects of Arsen Aldea on his personal portfolio site, including an interactive Minesweeper Escape game built with React."
                 name="Arsen Aldea"
                 type="article"
             />
-            <JournalPage title="Projects (under construction)" nextPage={nextPage} prevPage={prevPage} isCover={false} pageNumber={pageNumber}>
-                <ProjectsContentContainer>
-                    <WritingText message={message} repeat={false} onFinish={handleWritingFinish} />
-                    <MineSweeperEscape />
-                </ProjectsContentContainer>
-            </JournalPage>
+            {isDesktop ? (
+                <PageSpreadContainer>
+                    <JournalPage title="Projects" side="left" pageNumber={pageNumber}>
+                        {content1}
+                    </JournalPage>
+                    <JournalPage title="Minesweeper" side="right" pageNumber={pageNumber ? pageNumber + 1 : null}>
+                        {content2}
+                    </JournalPage>
+                </PageSpreadContainer>
+            ) : (
+                <JournalPage title="Projects" side="right" pageNumber={pageNumber} showNav={true} nextPage={nextPage} prevPage={prevPage}>
+                    {content1}
+                    {content2}
+                </JournalPage>
+            )}
         </>
     );
 };
