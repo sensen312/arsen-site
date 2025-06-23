@@ -1,0 +1,2 @@
+@keyframes quill-bob{0%{transform:translateY(0)}50%{transform:translateY(-4px)}to{transform:translateY(0)}}.quill-cursor{animation:quill-bob .8s ease-in-out infinite;color:#333;display:inline-block;font-size:2rem}
+/*# sourceMappingURL=main.39c70c9a.css.map*/
