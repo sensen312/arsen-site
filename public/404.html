@@ -4,22 +4,19 @@
     <meta charset="utf-8">
     <title>Arsen Aldea Site - Redirecting</title>
     <script type="text/javascript">
-      var segmentCount = 1;
+  
+      var segmentCount = 1; 
 
       var l = window.location;
-      var newPath = l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/';
-      var a = document.createElement('a');
-      a.href = l.href;
       
-      
-      a.pathname = newPath;
-      a.search = '?' + [
-        'p=' + l.pathname.slice(newPath.length).replace(/&/g, '~and~'),
-        'q=' + l.search.slice(1).replace(/&/g, '~and~'),
-        'h=' + l.hash.slice(1)
-      ].join('&');
-
-      l.replace(a.href);
+      var newPath = l.protocol + '//' + l.hostname + 
+                    (l.port ? ':' + l.port : '') +
+                    l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + 
+                    '/?p=/' + l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+                    (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+                    l.hash.slice(1);
+                    
+      l.replace(newPath);
     </script>
   </head>
   <body>

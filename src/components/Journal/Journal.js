@@ -18,7 +18,8 @@ const JournalContainer = styled('div')({
   perspective: '2000px',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'center', 
+  height: '100vh'
 });
 
 const JournalBody = styled('div')(({ theme }) => ({
@@ -32,7 +33,7 @@ const JournalBody = styled('div')(({ theme }) => ({
   alignItems: 'center',
   transition: 'transform 1s',
   transformStyle: 'preserve-3d',
-  zIndex: 2, // Ensure pages are above bookmarks
+  zIndex: 2, 
   [theme.breakpoints.up('md')]: {
     width: '144vh',
   }
@@ -71,16 +72,17 @@ const Journal = () => {
       pageNumber: index >= 1 ? pageNumberCounter++ : null
     }));
   }, []);
+  
+  const isHomePage = location.pathname === '/';
 
-  const { currentPage, nextPage, prevPage } = useMemo(() => {
+  const { nextPage, prevPage } = useMemo(() => {
     const currentIndex = pages.findIndex(p => p.path === location.pathname);
-    if (currentIndex === -1) return { currentPage: null, nextPage: null, prevPage: null };
+    if (currentIndex === -1) return { nextPage: null, prevPage: null };
 
     const nextPageIndex = (currentIndex + 1) % pages.length;
     const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
 
     return {
-        currentPage: pages[currentIndex],
         nextPage: pages[nextPageIndex].path,
         prevPage: pages[prevPageIndex].path,
     }
@@ -90,39 +92,47 @@ const Journal = () => {
     <ThemeProvider theme={classicVellumTheme}>
       <GlobalStyles />
       <JournalContainer>
-        {isDesktop && prevPage && currentPage?.path !== '/' && (
-            <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: 0 }}>
+        {isDesktop && prevPage && (
+            <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '1%' }}>
                 <ArrowBackIosNew />
             </DesktopNavArrow>
         )}
-        <JournalBody>
-          <Routes>
-            {pages.map((page, index) => {
-              const nextPageIndex = (index + 1) % pages.length;
-              const prevPageIndex = (index - 1 + pages.length) % pages.length;
-              return (
-                <Route
-                  key={page.path}
-                  path={page.path}
-                  element={
-                    <page.component
-                      nextPage={pages[nextPageIndex].path}
-                      prevPage={pages[prevPageIndex].path}
-                      pageNumber={page.pageNumber}
-                      isBookmark={page.isBookmark}
-                      pages={page.path === '/table-of-contents' ? pages : undefined}
-                    />
-                  }
-                />
-              );
-            })}
-          </Routes>
-        </JournalBody>
-        <JournalBookmark pages={pages} />
+
+        {isHomePage ? (
+            <HomePage nextPage={pages[1].path} />
+        ) : (
+            <JournalBody>
+                <Routes>
+                    {pages.filter(p => p.path !== '/').map((page) => {
+                         const currentIndex = pages.findIndex(p => p.path === page.path);
+                         const nextPageIndex = (currentIndex + 1) % pages.length;
+                         const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
+                        return (
+                            <Route
+                                key={page.path}
+                                path={page.path}
+                                element={
+                                    <page.component
+                                        nextPage={pages[nextPageIndex].path}
+                                        prevPage={pages[prevPageIndex].path}
+                                        pageNumber={page.pageNumber}
+                                        isBookmark={page.isBookmark}
+                                        pages={page.path === '/table-of-contents' ? pages : undefined}
+                                    />
+                                }
+                            />
+                        );
+                    })}
+                </Routes>
+            </JournalBody>
+        )}
+
+        <JournalBookmark pages={pages} isHomePage={isHomePage} isDesktop={isDesktop}/>
+        
         {isDesktop && nextPage && (
-             <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: 0 }}>
-                <ArrowForwardIos />
-            </DesktopNavArrow>
+             <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '1%' }}>
+                 <ArrowForwardIos />
+             </DesktopNavArrow>
         )}
       </JournalContainer>
     </ThemeProvider>
