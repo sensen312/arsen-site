@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const JournalCoverContainer = styled('div')(({ theme }) => ({
-    width: '72vh', 
+    width: '72vh',
     height: '90vh',
     maxWidth: '95vw',
     maxHeight: 'calc(95vw * 1.25)',
@@ -54,6 +54,16 @@ const Spine = styled('div')(({ theme }) => ({
     width: theme.proportions.spineWidth,
     backgroundColor: theme.colors.cover.spine,
     boxShadow: 'inset 8px 0 20px rgba(0,0,0,0.5)',
+    // --- Corrected Stitching Effect on Spine ---
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        top: '15px',
+        bottom: '15px',
+        right: '15px', // Positioned on the right side of the spine
+        borderLeft: `2px dashed rgba(255, 255, 255, 0.1)`, // Vertical dashed line
+        pointerEvents: 'none',
+    }
 }));
 
 const TitlePlate = styled('div')(({ theme }) => ({
