@@ -21,11 +21,12 @@ const FormContainer = styled('form')(({ theme }) => ({
     lineHeight: theme.page.lineHeight,
 }));
 
-const InputRow = styled('div')({
+const InputRow = styled('div')(({ theme }) => ({
     display: 'flex',
-    alignItems: 'baseline',
-    marginBottom: '0.2em',
-});
+    alignItems: 'center',
+    height: theme.page.lineHeight,
+    flexShrink: 0,
+}));
 
 const StyledLabel = styled('label')(({ theme }) => ({
     fontFamily: theme.fonts.heading,
@@ -52,6 +53,12 @@ const StyledInput = styled('input')(({ theme }) => ({
     },
 }));
 
+const TextareaWrapper = styled('div')({
+    flexGrow: 1,
+    position: 'relative',
+    overflow: 'hidden', 
+});
+
 const StyledTextarea = styled('textarea')(({ theme }) => ({
     fontFamily: theme.fonts.body,
     color: theme.colors.ink,
@@ -60,8 +67,11 @@ const StyledTextarea = styled('textarea')(({ theme }) => ({
     border: 'none',
     background: 'transparent',
     width: '100%',
-    height: 'calc(100% - 12em)',
+    height: '100%', 
     resize: 'none',
+    padding: 0,
+    boxSizing: 'border-box',
+    overflow: 'auto',
     '&:focus': {
         outline: 'none',
     },
@@ -69,6 +79,11 @@ const StyledTextarea = styled('textarea')(({ theme }) => ({
         color: '#b0b0b0',
         fontStyle: 'italic',
     },
+    '&::-webkit-scrollbar': {
+        display: 'none',
+    },
+    '-ms-overflow-style': 'none', 
+    'scrollbar-width': 'none', 
 }));
 
 const SubmitButton = styled(Button)(({ theme, disabled }) => ({
@@ -82,6 +97,7 @@ const SubmitButton = styled(Button)(({ theme, disabled }) => ({
     },
     fontWeight: 'bold',
     cursor: disabled ? 'not-allowed' : 'pointer',
+   
 }));
 
 
@@ -139,7 +155,14 @@ const ContactPage = ({ pageNumber }) => {
             <InputRow>
                 <StyledLabel htmlFor="message">Message:</StyledLabel>
             </InputRow>
-            <StyledTextarea name="message" id="message" required placeholder="your message..." />
+            <TextareaWrapper>
+                <StyledTextarea
+                    name="message"
+                    id="message"
+                    required
+                    placeholder="your message..."
+                />
+            </TextareaWrapper>
             <SubmitButton type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Sending..." : "Send Message"}
             </SubmitButton>
@@ -161,7 +184,7 @@ const ContactPage = ({ pageNumber }) => {
                        {formContent}
                     </JournalPage>
                     <JournalPage title="Notes" side="right" pageNumber={pageNumber ? pageNumber + 1 : null}>
-                       <p></p>
+                       <p>Leave a message here and it will be delivered directly to my personal email address. I look forward to hearing from you!</p>
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (
