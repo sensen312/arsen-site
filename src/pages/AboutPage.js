@@ -71,7 +71,7 @@ const StyledSVG = styled('svg')(({ theme }) => ({
 }));
 
 
-const AboutPage = ({ nextPage, prevPage, pageNumber }) => {
+const AboutPage = ({ pageNumber }) => {
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const [textEffect, setTextEffect] = useState('typing');
@@ -129,7 +129,7 @@ const AboutPage = ({ nextPage, prevPage, pageNumber }) => {
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (
-                <JournalPage title="About Me" side="right" pageNumber={pageNumber} showNav={true} nextPage={nextPage} prevPage={prevPage}>
+                <JournalPage title="About Me" side="right" pageNumber={pageNumber}>
                     {PageContent}
                     <MobilePolaroidImage src={aboutPic} alt="About Arsen" />
                 </JournalPage>

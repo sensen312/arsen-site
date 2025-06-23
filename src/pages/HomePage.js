@@ -1,9 +1,5 @@
 import React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import { IconButton, useMediaQuery } from '@mui/material';
-import { ArrowForward } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-
+import { styled } from '@mui/material/styles';
 
 const JournalCoverContainer = styled('div')(({ theme }) => ({
     width: '72vh',
@@ -105,25 +101,7 @@ const EmbossedSubtitle = styled('h2')(({ theme }) => ({
     textShadow: `1px 1px 1px ${theme.colors.cover.embossShadow}, -1px -1px 1px ${theme.colors.cover.embossHighlight}`,
 }));
 
-const ArrowButton = styled(IconButton)(({ theme }) => ({
-    position: 'absolute',
-    bottom: '1rem',
-    right: '1rem',
-    color: theme.colors.cover.plate,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    '&:hover': {
-        backgroundColor: 'rgba(0,0,0,0.4)',
-    },
-    '& svg': {
-        fontSize: '3rem',
-    },
-}));
-
-const HomePage = ({ nextPage }) => {
-    const navigate = useNavigate();
-    const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
-
+const HomePage = () => {
     return (
         <JournalCoverContainer>
             <JournalCover>
@@ -135,11 +113,6 @@ const HomePage = ({ nextPage }) => {
                     <EmbossedSubtitle>Journal I</EmbossedSubtitle>
                 </div>
             </JournalCover>
-            {!isDesktop && (
-              <ArrowButton onClick={() => navigate(nextPage)}>
-                  <ArrowForward />
-              </ArrowButton>
-            )}
         </JournalCoverContainer>
     );
 };

@@ -18,7 +18,6 @@ const DrawnToggleWrapper = styled(Box)(({ theme }) => ({
     height: theme.page.lineHeight,
     display: 'flex',
     alignItems: 'center',
-    marginBottom: theme.page.lineHeight,
     cursor: 'pointer',
     userSelect: 'none',
 }));
@@ -65,7 +64,7 @@ const RightPageContainer = styled(Box, {
     marginTop: isDesktop ?  theme.spacing(4) : theme.spacing(1),
 }));
 
-const ProjectsPage = ({ nextPage, prevPage, pageNumber }) => {
+const ProjectsPage = ({ pageNumber }) => {
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const [textEffect, setTextEffect] = useState('typing');
@@ -127,7 +126,7 @@ const ProjectsPage = ({ nextPage, prevPage, pageNumber }) => {
                 </PageSpreadContainer>
             ) : (
               <PageSpreadContainer>
-                <JournalPage title="Projects" side="right" pageNumber={pageNumber} showNav={true} nextPage={nextPage} prevPage={prevPage}>
+                <JournalPage title="Projects" side="right" pageNumber={pageNumber}>
                     {LeftPageContent}
                     {RightPageContent}
                   </JournalPage>

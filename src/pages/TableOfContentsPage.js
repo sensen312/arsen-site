@@ -38,7 +38,7 @@ const Leader = styled('span')({
     marginLeft: '0.5em',
 });
 
-const TableOfContentsPage = ({ pages, nextPage, prevPage, pageNumber }) => {
+const TableOfContentsPage = ({ pages, pageNumber }) => {
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     
@@ -68,7 +68,7 @@ const TableOfContentsPage = ({ pages, nextPage, prevPage, pageNumber }) => {
                 </JournalPage>
             </PageSpreadContainer>
         ) : (
-            <JournalPage title="Table of Contents" side="right" pageNumber={pageNumber} showNav={true} nextPage={nextPage} prevPage={prevPage}>
+            <JournalPage title="Table of Contents" side="right" pageNumber={pageNumber}>
                {tocContent}
             </JournalPage>
         )}

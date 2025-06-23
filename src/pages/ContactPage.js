@@ -85,7 +85,7 @@ const SubmitButton = styled(Button)(({ theme, disabled }) => ({
 }));
 
 
-const ContactPage = ({ nextPage, prevPage, pageNumber }) => {
+const ContactPage = ({ pageNumber }) => {
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const form = useRef();
@@ -165,7 +165,7 @@ const ContactPage = ({ nextPage, prevPage, pageNumber }) => {
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (
-                <JournalPage title="Contact" side="right" pageNumber={pageNumber} showNav={true} nextPage={nextPage} prevPage={prevPage}>
+                <JournalPage title="Contact" side="right" pageNumber={pageNumber}>
                     {formContent}
                 </JournalPage>
             )}

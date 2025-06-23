@@ -37,7 +37,7 @@ const DownloadButton = styled(Button)(({ theme }) => ({
     margin: `${theme.page.lineHeight} auto`,
 }));
 
-const ResumePage = ({ nextPage, prevPage, pageNumber }) => {
+const ResumePage = ({ pageNumber }) => {
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const handleDownloadResume = () => {
@@ -112,7 +112,7 @@ const ResumePage = ({ nextPage, prevPage, pageNumber }) => {
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (
-                <JournalPage title="Resume" side="right" pageNumber={pageNumber} showNav={true} nextPage={nextPage} prevPage={prevPage}>
+                <JournalPage title="Resume" side="right" pageNumber={pageNumber}>
                     {content1}<br />{content2}
                 </JournalPage>
             )}

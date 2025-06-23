@@ -7,7 +7,7 @@ import ResumePage from '../../pages/ResumePage';
 import TableOfContentsPage from '../../pages/TableOfContentsPage';
 import ContactPage from '../../pages/ContactPage';
 import { styled, ThemeProvider } from '@mui/material/styles';
-import { useMediaQuery, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import JournalBookmark from '../JournalBookmark/JournalBookmark';
 import { classicVellumTheme } from '../../styles/theme';
@@ -55,7 +55,6 @@ const DesktopNavArrow = styled(IconButton)(({ theme }) => ({
 const Journal = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isDesktop = useMediaQuery(classicVellumTheme.breakpoints.up('md'));
 
   const pages = useMemo(() => {
     const pageList = [
@@ -92,7 +91,7 @@ const Journal = () => {
     <ThemeProvider theme={classicVellumTheme}>
       <GlobalStyles />
       <JournalContainer>
-        {isDesktop && prevPage && (
+        {prevPage && (
             <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '1%' }}>
                 <ArrowBackIosNew />
             </DesktopNavArrow>
@@ -127,9 +126,9 @@ const Journal = () => {
             </JournalBody>
         )}
 
-        <JournalBookmark pages={pages} isHomePage={isHomePage} isDesktop={isDesktop}/>
+        <JournalBookmark pages={pages} isHomePage={isHomePage} />
         
-        {isDesktop && nextPage && (
+        {nextPage && (
              <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '1%' }}>
                  <ArrowForwardIos />
              </DesktopNavArrow>

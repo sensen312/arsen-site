@@ -45,7 +45,7 @@ const StyledBookmark = styled('div', {
   },
 }));
 
-const JournalBookmark = ({ pages, isDesktop }) => {
+const JournalBookmark = ({ pages }) => {
     
     const bookmarkColors = [
         '#b55d4f', // Muted Terracotta Red
@@ -57,10 +57,6 @@ const JournalBookmark = ({ pages, isDesktop }) => {
 
     const bookmarkedPages = pages.filter((page) => page.isBookmark);
     
-    if (!isDesktop) {
-        return null;
-    }
-
     return (
         <BookmarkContainer>
             {bookmarkedPages.map((page, index) => (

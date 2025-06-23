@@ -27,11 +27,12 @@ const themeValues = {
   page: {
     lineHeight: '1.6em',
     fontSize: 'clamp(16px, 1.8vh, 18px)',
+    wrapperPadding: '2.5rem', 
   },
   proportions: {
     spineWidth: '10%',
     pageMarginLineLeft: '10%',
-    pageContentPaddingLeft: '14%',
+    pageContentPaddingLeft: '10%',
   },
 };
 
