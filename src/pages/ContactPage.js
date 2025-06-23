@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import JournalPage from '../components/JournalPage/JournalPage';
 import { styled, useTheme } from '@mui/material/styles';
@@ -54,10 +54,9 @@ const StyledInput = styled('input')(({ theme }) => ({
 }));
 
 const TextareaWrapper = styled('div')({
-    flexGrow: 1,
-    position: 'relative',
-    overflow: 'hidden', 
+    position: 'relative', 
 });
+
 
 const StyledTextarea = styled('textarea')(({ theme }) => ({
     fontFamily: theme.fonts.body,
@@ -67,11 +66,10 @@ const StyledTextarea = styled('textarea')(({ theme }) => ({
     border: 'none',
     background: 'transparent',
     width: '100%',
-    height: '100%', 
     resize: 'none',
     padding: 0,
     boxSizing: 'border-box',
-    overflow: 'auto',
+    overflow: 'hidden', 
     '&:focus': {
         outline: 'none',
     },
@@ -79,11 +77,6 @@ const StyledTextarea = styled('textarea')(({ theme }) => ({
         color: '#b0b0b0',
         fontStyle: 'italic',
     },
-    '&::-webkit-scrollbar': {
-        display: 'none',
-    },
-    '-ms-overflow-style': 'none', 
-    'scrollbar-width': 'none', 
 }));
 
 const SubmitButton = styled(Button)(({ theme, disabled }) => ({
@@ -108,6 +101,16 @@ const ContactPage = ({ pageNumber }) => {
     const [statusMessage, setStatusMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const textareaRef = useRef(null);
+    const [messageValue, setMessageValue] = useState('');
+
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
+    }, [messageValue]); 
+
     const checkLastSubmission = () => {
         const lastSubmissionTime = sessionStorage.getItem('lastSubmissionTime');
         if (lastSubmissionTime) {
@@ -131,6 +134,7 @@ const ContactPage = ({ pageNumber }) => {
             .then(() => {
                 setStatusMessage("Message sent successfully!");
                 form.current.reset();
+                setMessageValue(''); 
                 sessionStorage.setItem('lastSubmissionTime', Date.now().toString());
                 setTimeout(() => setStatusMessage(""), 5000);
             }, (error) => {
@@ -157,10 +161,14 @@ const ContactPage = ({ pageNumber }) => {
             </InputRow>
             <TextareaWrapper>
                 <StyledTextarea
+                    ref={textareaRef}
                     name="message"
                     id="message"
                     required
                     placeholder="your message..."
+                    value={messageValue}
+                    onChange={(e) => setMessageValue(e.target.value)}
+                    rows={1}
                 />
             </TextareaWrapper>
             <SubmitButton type="submit" disabled={isSubmitting}>
@@ -184,7 +192,7 @@ const ContactPage = ({ pageNumber }) => {
                        {formContent}
                     </JournalPage>
                     <JournalPage title="Notes" side="right" pageNumber={pageNumber ? pageNumber + 1 : null}>
-                       <p>Leave a message here and it will be delivered directly to my personal email address. I look forward to hearing from you!</p>
+                       <p>HELLO THERE! USE THIS TO MESSAGE ME BUT KEEP IN MIND I ONLY GET A LIMITED AMOUNT OF MESSAGES A MONTH SO ;-; TY FOR VISITING MY SITE!</p>
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (
