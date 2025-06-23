@@ -161,7 +161,7 @@ const ContactPage = ({ pageNumber }) => {
                        {formContent}
                     </JournalPage>
                     <JournalPage title="Notes" side="right" pageNumber={pageNumber ? pageNumber + 1 : null}>
-                       <p>Leave a message here and it will be delivered directly to my personal email address. I look forward to hearing from you!</p>
+                       <p></p>
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (

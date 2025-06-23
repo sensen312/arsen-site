@@ -7,7 +7,7 @@ import ResumePage from '../../pages/ResumePage';
 import TableOfContentsPage from '../../pages/TableOfContentsPage';
 import ContactPage from '../../pages/ContactPage';
 import { styled, ThemeProvider } from '@mui/material/styles';
-import { IconButton } from '@mui/material';
+import { IconButton, useMediaQuery } from '@mui/material'; 
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import JournalBookmark from '../JournalBookmark/JournalBookmark';
 import { classicVellumTheme } from '../../styles/theme';
@@ -55,9 +55,10 @@ const DesktopNavArrow = styled(IconButton)(({ theme }) => ({
 const Journal = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isDesktop = useMediaQuery(classicVellumTheme.breakpoints.up('md')); 
 
   const pages = useMemo(() => {
-    const pageList = [
+    const pageDefinitions = [
       { path: '/', component: HomePage, title: 'Home', isBookmark: true },
       { path: '/table-of-contents', component: TableOfContentsPage, title: 'Table of Contents', isBookmark: true },
       { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
@@ -65,12 +66,24 @@ const Journal = () => {
       { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
       { path: '/contact', component: ContactPage, title: 'Contact', isBookmark: true },
     ];
-    let pageNumberCounter = 1;
-    return pageList.map((page, index) => ({
-      ...page,
-      pageNumber: index >= 1 ? pageNumberCounter++ : null
-    }));
-  }, []);
+    
+    let currentPageCounter = 1;
+
+    return pageDefinitions.map(page => {
+      if (page.path === '/') {
+      
+        return { ...page, pageNumber: null };
+      }
+
+      const newPage = { ...page, pageNumber: currentPageCounter };
+      
+      const isSpreadPage = true; 
+
+      currentPageCounter += (isSpreadPage && isDesktop) ? 2 : 1;
+
+      return newPage;
+    });
+  }, [isDesktop]); 
   
   const isHomePage = location.pathname === '/';
 
@@ -78,6 +91,7 @@ const Journal = () => {
     const currentIndex = pages.findIndex(p => p.path === location.pathname);
     if (currentIndex === -1) return { nextPage: null, prevPage: null };
 
+    // This logic remains the same and works correctly
     const nextPageIndex = (currentIndex + 1) % pages.length;
     const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
 
@@ -114,8 +128,9 @@ const Journal = () => {
                                     <page.component
                                         nextPage={pages[nextPageIndex].path}
                                         prevPage={pages[prevPageIndex].path}
-                                        pageNumber={page.pageNumber}
+                                        pageNumber={page.pageNumber} 
                                         isBookmark={page.isBookmark}
+                                    
                                         pages={page.path === '/table-of-contents' ? pages : undefined}
                                     />
                                 }
@@ -126,7 +141,7 @@ const Journal = () => {
             </JournalBody>
         )}
 
-        <JournalBookmark pages={pages} isHomePage={isHomePage} />
+        <JournalBookmark pages={pages} />
         
         {nextPage && (
              <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '1%' }}>

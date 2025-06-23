@@ -45,7 +45,7 @@ const TableOfContentsPage = ({ pages, pageNumber }) => {
     const tocContent = (
         <ContentContainer>
             {pages && pages
-                .filter((page) => page.isBookmark)
+                .filter((page) => page.isBookmark && page.path !== '/') // Don't show the cover in ToC
                 .map((page, index) => (
                     <ClickableLineItem key={index} to={page.path}>
                         <TitleSpan>{page.title}</TitleSpan>
