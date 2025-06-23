@@ -14,34 +14,27 @@ import { classicVellumTheme } from '../../styles/theme';
 import GlobalStyles from '../../styles/GlobalStyles';
 
 const JournalContainer = styled('div')({
-  position: 'relative',
-  perspective: '2000px',
+  position: 'relative',
+  perspective: '2000px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '100%',
-  height: '100vh',
 });
 
-const JournalBody = styled('div')(({ theme, iscover }) => ({
-  position: 'relative',
-  height: '90vh',
-  maxWidth: '95vw',
-  maxHeight: 'calc(95vw * 1.25)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  transition: 'width 0.5s ease-in-out',
-  transformStyle: 'preserve-3d',
-  zIndex: 2,
-
-  // Default to single-page width
+const JournalBody = styled('div')(({ theme }) => ({
+  position: 'relative',
   width: '72vh',
-
-  // If it's the cover on desktop, stay as a single page width.
-  // If it's NOT the cover on desktop, expand to double width.
+  height: '90vh',
+  maxWidth: '95vw',
+  maxHeight: 'calc(95vw * 1.25)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  transition: 'transform 1s',
+  transformStyle: 'preserve-3d',
+  zIndex: 2, // Ensure pages are above bookmarks
   [theme.breakpoints.up('md')]: {
-    width: iscover ? '72vh' : '144vh',
+    width: '144vh',
   }
 }));
 
@@ -59,79 +52,81 @@ const DesktopNavArrow = styled(IconButton)(({ theme }) => ({
 
 
 const Journal = () => {
-  const location = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
-  const isDesktop = useMediaQuery(classicVellumTheme.breakpoints.up('md'));
-  const isCover = location.pathname === '/';
+  const isDesktop = useMediaQuery(classicVellumTheme.breakpoints.up('md'));
 
-  const pages = useMemo(() => {
-    const pageList = [
-      { path: '/', component: HomePage, title: 'Home', isBookmark: true },
-      { path: '/table-of-contents', component: TableOfContentsPage, title: 'Table of Contents', isBookmark: true },
-      { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
-      { path: '/projects', component: ProjectsPage, title: 'Projects', isBookmark: true },
-      { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
-      { path: '/contact', component: ContactPage, title: 'Contact', isBookmark: true },
-    ];
-    let pageNumberCounter = 1;
-    return pageList.map((page, index) => ({
-      ...page,
-      pageNumber: index >= 1 ? pageNumberCounter++ : null
-    }));
-  }, []);
+  const pages = useMemo(() => {
+    const pageList = [
+      { path: '/', component: HomePage, title: 'Home', isBookmark: true },
+      { path: '/table-of-contents', component: TableOfContentsPage, title: 'Table of Contents', isBookmark: true },
+      { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
+      { path: '/projects', component: ProjectsPage, title: 'Projects', isBookmark: true },
+      { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
+      { path: '/contact', component: ContactPage, title: 'Contact', isBookmark: true },
+    ];
+    let pageNumberCounter = 1;
+    return pageList.map((page, index) => ({
+      ...page,
+      pageNumber: index >= 1 ? pageNumberCounter++ : null
+    }));
+  }, []);
 
-  const { nextPage, prevPage } = useMemo(() => {
+  const { currentPage, nextPage, prevPage } = useMemo(() => {
     const currentIndex = pages.findIndex(p => p.path === location.pathname);
-    if (currentIndex === -1) return { nextPage: null, prevPage: null };
+    if (currentIndex === -1) return { currentPage: null, nextPage: null, prevPage: null };
+
     const nextPageIndex = (currentIndex + 1) % pages.length;
     const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
+
     return {
+        currentPage: pages[currentIndex],
         nextPage: pages[nextPageIndex].path,
         prevPage: pages[prevPageIndex].path,
     }
   }, [location.pathname, pages]);
-  
-  return (
-    <ThemeProvider theme={classicVellumTheme}>
-      <GlobalStyles />
-      <JournalContainer>
-        {isDesktop && prevPage && !isCover && (
-            <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '1vw' }}>
+  
+  return (
+    <ThemeProvider theme={classicVellumTheme}>
+      <GlobalStyles />
+      <JournalContainer>
+        {isDesktop && prevPage && currentPage?.path !== '/' && (
+            <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: 0 }}>
                 <ArrowBackIosNew />
             </DesktopNavArrow>
         )}
-        <JournalBody iscover={isCover ? 1 : 0}>
-          <Routes>
-            {pages.map((page, index) => {
-              const nextPageIndex = (index + 1) % pages.length;
-              const prevPageIndex = (index - 1 + pages.length) % pages.length;
-              return (
-                <Route
-                  key={page.path}
-                  path={page.path}
-                  element={
-                    <page.component
-                      nextPage={pages[nextPageIndex].path}
-                      prevPage={pages[prevPageIndex].path}
-                      pageNumber={page.pageNumber}
-                      isBookmark={page.isBookmark}
-                      pages={page.path === '/table-of-contents' ? pages : undefined}
-                    />
-                  }
-                />
-              );
-            })}
-          </Routes>
-          <JournalBookmark pages={pages} />
-        </JournalBody>
+        <JournalBody>
+          <Routes>
+            {pages.map((page, index) => {
+              const nextPageIndex = (index + 1) % pages.length;
+              const prevPageIndex = (index - 1 + pages.length) % pages.length;
+              return (
+                <Route
+                  key={page.path}
+                  path={page.path}
+                  element={
+                    <page.component
+                      nextPage={pages[nextPageIndex].path}
+                      prevPage={pages[prevPageIndex].path}
+                      pageNumber={page.pageNumber}
+                      isBookmark={page.isBookmark}
+                      pages={page.path === '/table-of-contents' ? pages : undefined}
+                    />
+                  }
+                />
+              );
+            })}
+          </Routes>
+        </JournalBody>
+        <JournalBookmark pages={pages} />
         {isDesktop && nextPage && (
-             <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '1vw' }}>
+             <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: 0 }}>
                 <ArrowForwardIos />
             </DesktopNavArrow>
         )}
-      </JournalContainer>
-    </ThemeProvider>
-  );
+      </JournalContainer>
+    </ThemeProvider>
+  );
 };
 
 export default Journal;
