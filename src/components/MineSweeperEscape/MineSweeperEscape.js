@@ -573,7 +573,7 @@ const MineSweeperEscape = () => {
                                 control={<Switch checked={isFlaggingMode} onChange={() => setIsFlaggingMode(!isFlaggingMode)} color="primary" />}
                                 label="🚩 Mark Mode"
                             />
-                            {isFlaggingMode && <Typography variant="caption" sx={{fontFamily: '"Press Start 2P", sans-serif', fontSize: '0.5rem'}}>Click to mark tiles</Typography>}
+                            {isFlaggingMode && <Typography variant="caption" sx={{fontFamily: '"Press Start 2P", sans-serif', fontSize: '0.6rem'}}>Click to mark tiles</Typography>}
                         </ToggleContainer>
                     </ControlsWrapper>
                 </>
