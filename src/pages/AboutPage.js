@@ -113,7 +113,7 @@ const AboutPage = ({ pageNumber }) => {
         <>
             <SEO
                 title="About Me | Arsen Aldea Site"
-                description="Learn more about Arsen Aldea, a full-stack developer with experience at FLVS and PerfectServe. Discover his skills in React, .NET, and more on his personal site."
+                description="Learn more about Arsen Aldea, a full-stack developer with experience at FLVS and PerfectServe. Discover their skills in React, .NET, and more on their personal site."
                 name="Arsen Aldea"
                 type="article"
             />

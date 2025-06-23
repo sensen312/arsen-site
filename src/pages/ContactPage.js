@@ -182,7 +182,7 @@ const ContactPage = ({ pageNumber }) => {
         <>
             <SEO
                 title="Contact Arsen Aldea | Portfolio Site"
-                description="Get in touch with Arsen Aldea through the contact page on his personal portfolio site. Reach out for collaboration or inquiries."
+                description="Get in touch with Arsen Aldea through the contact page on their personal portfolio site. Reach out for collaboration or inquiries."
                 name="Arsen Aldea"
                 type="profile"
             />
