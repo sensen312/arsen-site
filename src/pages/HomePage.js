@@ -84,7 +84,7 @@ const TitlePlate = styled('div')(({ theme }) => ({
 const CoverTitle = styled('h1')(({ theme }) => ({
     fontFamily: theme.fonts.heading,
     color: theme.colors.cover.title,
-    fontSize: 'clamp(1.3rem, 10h, 4rem)',
+    fontSize: 'clamp(1.3rem, 6vh, 4rem)',
     fontWeight: 700,
     margin: 0,
     textShadow: `1px 1px 0px ${theme.colors.cover.embossHighlight}`,
