@@ -84,8 +84,8 @@ const TitlePlate = styled('div')(({ theme }) => ({
 const CoverTitle = styled('h1')(({ theme }) => ({
     fontFamily: theme.fonts.heading,
     color: theme.colors.cover.title,
-    fontSize: 'clamp(1.3rem, 6vh, 4rem)',
-    fontWeight: 700,
+    fontSize: 'clamp(1.1rem, 5.8vh, 4rem)',
+    fontWeight: 650,
     margin: 0,
     textShadow: `1px 1px 0px ${theme.colors.cover.embossHighlight}`,
 }));
@@ -93,7 +93,7 @@ const CoverTitle = styled('h1')(({ theme }) => ({
 const EmbossedSubtitle = styled('h2')(({ theme }) => ({
     fontFamily: theme.fonts.script,
     color: theme.colors.cover.embossBeige,
-    fontSize: 'clamp(1.2rem, 6vh, 3.2rem)',
+    fontSize: 'clamp(1rem, 5.8vh, 3.2rem)',
     fontWeight: 600,
     marginTop: '1.5rem',
     opacity: 0.9,
