@@ -91,7 +91,6 @@ const Journal = () => {
     const currentIndex = pages.findIndex(p => p.path === location.pathname);
     if (currentIndex === -1) return { nextPage: null, prevPage: null };
 
-    // This logic remains the same and works correctly
     const nextPageIndex = (currentIndex + 1) % pages.length;
     const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
 
@@ -106,7 +105,7 @@ const Journal = () => {
       <GlobalStyles />
       <JournalContainer>
         {prevPage && (
-            <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '1%' }}>
+            <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '.1%' }}>
                 <ArrowBackIosNew />
             </DesktopNavArrow>
         )}
@@ -144,7 +143,7 @@ const Journal = () => {
         <JournalBookmark pages={pages} />
         
         {nextPage && (
-             <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '1%' }}>
+             <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '.1%' }}>
                  <ArrowForwardIos />
              </DesktopNavArrow>
         )}
