@@ -50,14 +50,13 @@ const Spine = styled('div')(({ theme }) => ({
     width: theme.proportions.spineWidth,
     backgroundColor: theme.colors.cover.spine,
     boxShadow: 'inset 8px 0 20px rgba(0,0,0,0.5)',
-    // --- Corrected Stitching Effect on Spine ---
     '&::after': {
         content: '""',
         position: 'absolute',
         top: '15px',
         bottom: '15px',
-        right: '15px', // Positioned on the right side of the spine
-        borderLeft: `2px dashed rgba(255, 255, 255, 0.1)`, // Vertical dashed line
+        right: '15px', 
+        borderLeft: `2px dashed rgba(255, 255, 255, 0.1)`, 
         pointerEvents: 'none',
     }
 }));
@@ -85,7 +84,7 @@ const TitlePlate = styled('div')(({ theme }) => ({
 const CoverTitle = styled('h1')(({ theme }) => ({
     fontFamily: theme.fonts.heading,
     color: theme.colors.cover.title,
-    fontSize: 'clamp(1.4rem, 7.5vh, 4rem)',
+    fontSize: 'clamp(1.3rem, 10h, 4rem)',
     fontWeight: 700,
     margin: 0,
     textShadow: `1px 1px 0px ${theme.colors.cover.embossHighlight}`,
@@ -95,7 +94,7 @@ const EmbossedSubtitle = styled('h2')(({ theme }) => ({
     fontFamily: theme.fonts.script,
     color: theme.colors.cover.embossBeige,
     fontSize: 'clamp(1.2rem, 6vh, 3.2rem)',
-    fontWeight: 700,
+    fontWeight: 600,
     marginTop: '1.5rem',
     opacity: 0.9,
     textShadow: `1px 1px 1px ${theme.colors.cover.embossShadow}, -1px -1px 1px ${theme.colors.cover.embossHighlight}`,
