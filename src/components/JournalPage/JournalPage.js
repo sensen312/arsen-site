@@ -11,7 +11,6 @@ const JournalPageWrapper = styled('div')(({ theme, side }) => ({
     boxShadow: 'inset 0 0 20px rgba(0,0,0,0.15)',
     padding: theme.page.wrapperPadding,
     borderRadius: side === 'left' ? '8px 0 0 8px' : '0 8px 8px 0',
-    overflow: 'hidden',
     '&::before': {
         content: '""',
         position: 'absolute',
