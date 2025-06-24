@@ -60,7 +60,6 @@ const TableOfContentsPage = ({ pages, pageNumber, isSpread }) => {
                     {tocContent}
                 </JournalPage>
                 <JournalPage title="" side="right" pageNumber={pageNumber ? pageNumber + 1 : null}>
-                    {/* Blank page */}
                 </JournalPage>
             </PageSpreadContainer>
         ) : (
