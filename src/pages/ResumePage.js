@@ -166,7 +166,7 @@ const ResumePage = ({ pageNumber }) => {
         <>
             <SEO
                 title="Resume | Arsen Aldea's Developer Site"
-                description="View the professional resume of Arsen Aldea, a software developer with experience in full-stack development, C++, and various modern frameworks. Download the PDF from his site."
+                description="View the professional resume of Arsen Aldea, a software developer with experience in full-stack development, C++, and various modern frameworks. Download the PDF from their site."
                 name="Arsen Aldea"
                 type="article"
             />

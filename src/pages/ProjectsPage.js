@@ -69,7 +69,7 @@ const ProjectsPage = ({ pageNumber }) => {
     const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const [textEffect, setTextEffect] = useState('typing');
 
-    const projectDescriptionMessage = "Welcome to my projects page; currently still adding to this page; In the meantime how about you play my game Minesweeper Escape!. Your avatar is stuck in mine sweeper and you have to get to the crown (with WSAD) to get out! Be careful some hidden tiles contain boms, the numbers are hints that show you how many bombs there are around that tile. Theres always a solution here so do your best to get out!";
+    const projectDescriptionMessage = "Welcome to my projects page; currently still adding to this page; In the meantime how about you play my game Minesweeper Escape!. Your avatar is stuck in mine sweeper and you have to get to the crown (with WSAD) to get out! Be careful some hidden tiles contain bombs, the numbers are hints that show you how many bombs there are around that tile. Theres always a solution here so do your best to get out!";
     
     const DrawnToggle = (
         <DrawnToggleWrapper onClick={() => setTextEffect(prev => prev === 'typing' ? 'writing' : 'typing')}>
@@ -111,7 +111,7 @@ const ProjectsPage = ({ pageNumber }) => {
         <>
             <SEO
                 title="Projects | Arsen Aldea's Portfolio Site"
-                description="Explore the projects of Arsen Aldea on his personal portfolio site, including an interactive Minesweeper Escape game built with React."
+                description="Explore the projects of Arsen Aldea on their personal portfolio site, including an interactive Minesweeper Escape game built with React."
                 name="Arsen Aldea"
                 type="article"
             />
