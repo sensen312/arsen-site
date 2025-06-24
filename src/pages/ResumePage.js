@@ -1,20 +1,18 @@
 import React from 'react';
 import JournalPage from '../components/JournalPage/JournalPage';
 import SEO from '../components/SEO/SEO';
-import { useMediaQuery, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { Button } from '@mui/material';
 
 const PageSpreadContainer = styled('div')({
-  display: 'flex',
-  width: '100%',
-  height: '100%',
-  boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
 });
 
-const ResumeSection = styled('div')(({ theme }) => ({
-   
-}));
+const ResumeSection = styled('div')(({ theme }) => ({}));
 
 const SectionTitle = styled('strong')(({ theme }) => ({
     fontFamily: theme.fonts.heading,
@@ -31,14 +29,9 @@ const FlexHeader = styled('div')({
 const ItalicText = styled('span')({ fontStyle: 'italic' });
 const UnderlineText = styled('span')({ textDecoration: 'underline' });
 
-const BulletList = styled('ul')(({ theme }) => ({
-    listStyle: 'none',
-    paddingLeft: '1.5em',
-}));
-
 const BulletPoint = styled('li')({
     position: 'relative',
-    paddingBottom: 0, // No extra padding below bullets
+    paddingBottom: 0, 
     '&::before': {
         content: '"—"',
         position: 'absolute',
@@ -46,8 +39,7 @@ const BulletPoint = styled('li')({
     },
 });
 
-const SkillsContainer = styled('div')(({ theme }) => ({
-}));
+const SkillsContainer = styled('div')(({ theme }) => ({}));
 
 const SkillsCategory = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -72,9 +64,8 @@ const DownloadButton = styled(Button)(({ theme }) => ({
     display: 'block',
 }));
 
-const ResumePage = ({ pageNumber }) => {
+const ResumePage = ({ pageNumber, isSpread }) => {
     const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
     const handleDownloadResume = () => {
         window.open('https://docs.google.com/document/d/1rNOPJBW7S7UGX_stoMxKkO7skmgWWwndHnJmOKkS7J4/export?format=pdf', '_blank');
@@ -94,24 +85,19 @@ const ResumePage = ({ pageNumber }) => {
             </ResumeSection>
             <ResumeSection>
                 <SectionTitle>Work Experience</SectionTitle>
-                    <FlexHeader>
-                        <span><strong><UnderlineText>Software Developer Intern</UnderlineText></strong>, <ItalicText>FLVS</ItalicText>,  <ItalicText>June 2023 - May 2024</ItalicText></span>
-                       
-                    </FlexHeader>
-                   
-                        <BulletPoint>Refactored the CSS for new Student Information System. Created the global style sheet to elimimate React UI bugs and establish UI uniformity.</BulletPoint>
-                        <BulletPoint>Contributed to backend development by documenting and maintaining CRUD APIs, utilizing .NET Core and MongoDB.</BulletPoint>
-                        <BulletPoint>Developed unit tests for Node.js CRUD API operations using Jest to achieve over 90% code coverage.</BulletPoint>
-                 
-                    <FlexHeader>
-                        <span><strong><UnderlineText>Software Developer Intern</UnderlineText></strong>, <ItalicText>PerfectServe</ItalicText></span>
-                        <ItalicText>Oct 2021 - Nov 2022</ItalicText>
-                    </FlexHeader>
-                   
-                        <BulletPoint>Led the construction of a notification tracking API using .NET 5 to improve debugging for notification failures.</BulletPoint>
-                        <BulletPoint>Engineered challenging UI components in React & TypeScript, including a custom textbox to enhance user experience.</BulletPoint>
-                        <BulletPoint>Automated billing data validation with a Python/Pandas script, reducing a 20-minute manual task to just 5 minutes.</BulletPoint>
-                  
+                <FlexHeader>
+                    <span><strong><UnderlineText>Software Developer Intern</UnderlineText></strong>, <ItalicText>FLVS</ItalicText>, <ItalicText>June 2023 - May 2024</ItalicText></span>
+                </FlexHeader>
+                <BulletPoint>Refactored the CSS for new Student Information System. Created the global style sheet to elimimate React UI bugs and establish UI uniformity.</BulletPoint>
+                <BulletPoint>Contributed to backend development by documenting and maintaining CRUD APIs, utilizing .NET Core and MongoDB.</BulletPoint>
+                <BulletPoint>Developed unit tests for Node.js CRUD API operations using Jest to achieve over 90% code coverage.</BulletPoint>
+                <FlexHeader>
+                    <span><strong><UnderlineText>Software Developer Intern</UnderlineText></strong>, <ItalicText>PerfectServe</ItalicText></span>
+                    <ItalicText>Oct 2021 - Nov 2022</ItalicText>
+                </FlexHeader>
+                <BulletPoint>Led the construction of a notification tracking API using .NET 5 to improve debugging for notification failures.</BulletPoint>
+                <BulletPoint>Engineered challenging UI components in React & TypeScript, including a custom textbox to enhance user experience.</BulletPoint>
+                <BulletPoint>Automated billing data validation with a Python/Pandas script, reducing a 20-minute manual task to just 5 minutes.</BulletPoint>
             </ResumeSection>
         </>
     );
@@ -121,21 +107,14 @@ const ResumePage = ({ pageNumber }) => {
             <ResumeSection>
                 <SectionTitle>Projects</SectionTitle>
                 <br/>
-                    <strong><ItalicText>OrigamiMaker - College Senior Project</ItalicText></strong>
-                
-                        <BulletPoint>Spearheaded the modernization of a 20-year-old codebase called Treemaker, by refactoring all the legacy code to run on modern C++ compilers.</BulletPoint>
-                        <BulletPoint>Developed a QT wrapper to bridge the legacy backend to a new UI, allowing users to "draw" tree shapes for origami models.</BulletPoint>
-                   
-                    <strong><ItalicText>Minecraft Diamond Pathfinder Comparison</ItalicText></strong>
-                   
-                        <BulletPoint>Implemented and benchmarked Dijkstra's vs. Bellman-Ford in Java for Minecraft pathfinding, analyzing over 40,000 blocks/sec of data.</BulletPoint>
-                
-                    <strong><ItalicText>Compiler for PL/0</ItalicText></strong>
-                    
-                        <BulletPoint>Built a complete compiler with a scanner, parser, virtual machine, and intermediate code generation.</BulletPoint>
-                  
+                <strong><ItalicText>OrigamiMaker - College Senior Project</ItalicText></strong>
+                <BulletPoint>Spearheaded the modernization of a 20-year-old codebase called Treemaker, by refactoring all the legacy code to run on modern C++ compilers.</BulletPoint>
+                <BulletPoint>Developed a QT wrapper to bridge the legacy backend to a new UI, allowing users to "draw" tree shapes for origami models.</BulletPoint>
+                <strong><ItalicText>Minecraft Diamond Pathfinder Comparison</ItalicText></strong>
+                <BulletPoint>Implemented and benchmarked Dijkstra's vs. Bellman-Ford in Java for Minecraft pathfinding, analyzing over 40,000 blocks/sec of data.</BulletPoint>
+                <strong><ItalicText>Compiler for PL/0</ItalicText></strong>
+                <BulletPoint>Built a complete compiler with a scanner, parser, virtual machine, and intermediate code generation.</BulletPoint>
             </ResumeSection>
-
             <ResumeSection>
                 <SectionTitle>Technical Skills</SectionTitle>
                 <SkillsContainer>
@@ -153,9 +132,7 @@ const ResumePage = ({ pageNumber }) => {
                     </SkillsCategory>
                 </SkillsContainer>
             </ResumeSection>
-            
-            <Box sx={{ flexGrow: 1, minHeight: '0em' }} /> {/* Pushes button to bottom */}
-            
+            <Box sx={{ flexGrow: 1, minHeight: '0em' }} />
             <DownloadButton onClick={handleDownloadResume}>
                 Download Full Resume
             </DownloadButton>
@@ -170,7 +147,7 @@ const ResumePage = ({ pageNumber }) => {
                 name="Arsen Aldea"
                 type="article"
             />
-            {isDesktop ? (
+            {isSpread ? (
                 <PageSpreadContainer>
                     <JournalPage title="Arsen Aldea" side="left" pageNumber={pageNumber}>
                         {educationAndExperienceContent}

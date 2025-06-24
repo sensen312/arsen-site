@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import JournalPage from '../components/JournalPage/JournalPage';
 import SEO from '../components/SEO/SEO';
-import { useMediaQuery, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import aboutPic from '../assets/images/aboutPic.jpg';
 import WritingText from '../components/WritingText/WritingText';
 import TypingText from '../components/TypingText/TypingText';
 
 const PageSpreadContainer = styled('div')({
-  display: 'flex',
-  width: '100%',
-  height: '100%',
-  boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
 });
 
 const DesktopPolaroidImage = styled('img')(({ theme }) => ({
@@ -37,7 +37,6 @@ const DrawnToggleWrapper = styled(Box)(({ theme }) => ({
     height: theme.page.lineHeight,
     display: 'flex',
     alignItems: 'center',
- 
     cursor: 'pointer',
     userSelect: 'none',
 }));
@@ -55,7 +54,7 @@ const StyledSVG = styled('svg')(({ theme }) => ({
         fontFamily: theme.fonts.body,
     },
     '& .writing-label': {
-        fontSize: 'clamp(1.2rem, 3vh, 1.2rem)', 
+        fontSize: 'clamp(1.2rem, 3vh, 1.2rem)',
     },
     '& .track, & .knob': {
         stroke: theme.colors.ink,
@@ -70,10 +69,8 @@ const StyledSVG = styled('svg')(({ theme }) => ({
     }
 }));
 
-
-const AboutPage = ({ pageNumber }) => {
+const AboutPage = ({ pageNumber, isSpread }) => {
     const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const [textEffect, setTextEffect] = useState('typing');
 
     const aboutMeMessage = "Greetings! My name is Arsen Aldea. I am a recent Computer Science Graduate from the University of Florida. I have around 2 years of full stack internship experience under my belt, working at both FLVS and PerfectServe. My internships have allowed me to refine my skills in various programming languages, front-end technologies, and back-end systems, all while teaching me important skills in team work and communication.";
@@ -92,12 +89,11 @@ const AboutPage = ({ pageNumber }) => {
                     <path className="track" d="M2,10 a8,8 0 0,1 8,-8 H30 a8,8 0 0,1 8,8 v0 a8,8 0 0,1 -8,8 H10 a8,8 0 0,1 -8,-8 z" />
                     <circle className="knob" cx="10" cy="10" r="6" style={{ transform: textEffect === 'typing' ? 'translateX(0px)' : 'translateX(20px)' }}/>
                 </g>
-                {/* The 'writing-label' class has been added to this text element */}
                 <text x="135" y="15" className="label writing-label" fill={textEffect === 'writing' ? theme.colors.ink : '#aaa'}>Writing</text>
             </StyledSVG>
         </DrawnToggleWrapper>
     );
-    
+
     const PageContent = (
         <>
             {DrawnToggle}
@@ -117,7 +113,7 @@ const AboutPage = ({ pageNumber }) => {
                 name="Arsen Aldea"
                 type="article"
             />
-            {isDesktop ? (
+            {isSpread ? (
                 <PageSpreadContainer>
                     <JournalPage title="About Me" side="left" pageNumber={pageNumber}>
                         {PageContent}

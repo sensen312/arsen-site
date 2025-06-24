@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from '../../pages/HomePage';
 import AboutPage from '../../pages/AboutPage';
@@ -7,36 +7,35 @@ import ResumePage from '../../pages/ResumePage';
 import TableOfContentsPage from '../../pages/TableOfContentsPage';
 import ContactPage from '../../pages/ContactPage';
 import { styled, ThemeProvider } from '@mui/material/styles';
-import { IconButton, useMediaQuery } from '@mui/material'; 
+import { IconButton } from '@mui/material';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import JournalBookmark from '../JournalBookmark/JournalBookmark';
 import { classicVellumTheme } from '../../styles/theme';
 import GlobalStyles from '../../styles/GlobalStyles';
 
 const JournalContainer = styled('div')({
-  position: 'relative',
-  perspective: '2000px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center', 
-  height: '100vh'
+    position: 'relative',
+    perspective: '2000px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh'
 });
 
-const JournalBody = styled('div')(({ theme }) => ({
-  position: 'relative',
-  width: '72vh',
-  height: '90vh',
-  maxWidth: '95vw',
-  maxHeight: 'calc(95vw * 1.25)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  transition: 'transform 1s',
-  transformStyle: 'preserve-3d',
-  zIndex: 2, 
-  [theme.breakpoints.up('md')]: {
-    width: '144vh',
-  }
+const JournalBody = styled('div', {
+    shouldForwardProp: (prop) => prop !== 'isSpread',
+})(({ theme, isSpread }) => ({
+    position: 'relative',
+    width: isSpread ? '144vh' : '72vh',
+    height: '90vh',
+    maxWidth: '95vw',
+    maxHeight: 'calc(95vw * 1.25)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    transition: 'transform 1s',
+    transformStyle: 'preserve-3d',
+    zIndex: 2,
 }));
 
 const DesktopNavArrow = styled(IconButton)(({ theme }) => ({
@@ -51,105 +50,105 @@ const DesktopNavArrow = styled(IconButton)(({ theme }) => ({
     },
 }));
 
-
 const Journal = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isDesktop = useMediaQuery(classicVellumTheme.breakpoints.up('md')); 
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [isSpread, setIsSpread] = useState(false);
 
-  const pages = useMemo(() => {
-    const pageDefinitions = [
-      { path: '/', component: HomePage, title: 'Home', isBookmark: true },
-      { path: '/table-of-contents', component: TableOfContentsPage, title: 'Table of Contents', isBookmark: true },
-      { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
-      { path: '/projects', component: ProjectsPage, title: 'Projects', isBookmark: true },
-      { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
-      { path: '/contact', component: ContactPage, title: 'Contact', isBookmark: true },
-    ];
-    
-    let currentPageCounter = 1;
+    useEffect(() => {
+        const handleResize = () => {
+            const spread = window.innerWidth > window.innerHeight && window.innerWidth >= 1024;
+            setIsSpread(spread);
+        };
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
-    return pageDefinitions.map(page => {
-      if (page.path === '/') {
-      
-        return { ...page, pageNumber: null };
-      }
+    const pages = useMemo(() => {
+        const pageDefinitions = [
+            { path: '/', component: HomePage, title: 'Home', isBookmark: true },
+            { path: '/table-of-contents', component: TableOfContentsPage, title: 'Table of Contents', isBookmark: true },
+            { path: '/about', component: AboutPage, title: 'About', isBookmark: true },
+            { path: '/projects', component: ProjectsPage, title: 'Projects', isBookmark: true },
+            { path: '/resume', component: ResumePage, title: 'Resume', isBookmark: true },
+            { path: '/contact', component: ContactPage, title: 'Contact', isBookmark: true },
+        ];
 
-      const newPage = { ...page, pageNumber: currentPageCounter };
-      
-      const isSpreadPage = true; 
+        let currentPageCounter = 1;
+        return pageDefinitions.map(page => {
+            if (page.path === '/') {
+                return { ...page, pageNumber: null };
+            }
+            const newPage = { ...page, pageNumber: currentPageCounter };
+            currentPageCounter += isSpread ? 2 : 1;
+            return newPage;
+        });
+    }, [isSpread]);
 
-      currentPageCounter += (isSpreadPage && isDesktop) ? 2 : 1;
+    const isHomePage = location.pathname === '/';
 
-      return newPage;
-    });
-  }, [isDesktop]); 
-  
-  const isHomePage = location.pathname === '/';
+    const { nextPage, prevPage } = useMemo(() => {
+        const currentIndex = pages.findIndex(p => p.path === location.pathname);
+        if (currentIndex === -1) return { nextPage: null, prevPage: null };
+        const nextPageIndex = (currentIndex + 1) % pages.length;
+        const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
+        return {
+            nextPage: pages[nextPageIndex].path,
+            prevPage: pages[prevPageIndex].path,
+        }
+    }, [location.pathname, pages]);
 
-  const { nextPage, prevPage } = useMemo(() => {
-    const currentIndex = pages.findIndex(p => p.path === location.pathname);
-    if (currentIndex === -1) return { nextPage: null, prevPage: null };
+    return (
+        <ThemeProvider theme={classicVellumTheme}>
+            <GlobalStyles />
+            <JournalContainer>
+                {prevPage && (
+                    <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '.1%' }}>
+                        <ArrowBackIosNew />
+                    </DesktopNavArrow>
+                )}
 
-    const nextPageIndex = (currentIndex + 1) % pages.length;
-    const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
-
-    return {
-        nextPage: pages[nextPageIndex].path,
-        prevPage: pages[prevPageIndex].path,
-    }
-  }, [location.pathname, pages]);
-  
-  return (
-    <ThemeProvider theme={classicVellumTheme}>
-      <GlobalStyles />
-      <JournalContainer>
-        {prevPage && (
-            <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '.1%' }}>
-                <ArrowBackIosNew />
-            </DesktopNavArrow>
-        )}
-
-        {isHomePage ? (
-            <HomePage nextPage={pages[1].path} />
-        ) : (
-            <JournalBody>
-                <Routes>
-                    {pages.filter(p => p.path !== '/').map((page) => {
-                         const currentIndex = pages.findIndex(p => p.path === page.path);
-                         const nextPageIndex = (currentIndex + 1) % pages.length;
-                         const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
-                        return (
-                            <Route
-                                key={page.path}
-                                path={page.path}
-                                element={
-                                    <page.component
-                                        nextPage={pages[nextPageIndex].path}
-                                        prevPage={pages[prevPageIndex].path}
-                                        pageNumber={page.pageNumber} 
-                                        isBookmark={page.isBookmark}
-                                    
-                                        pages={page.path === '/table-of-contents' ? pages : undefined}
+                {isHomePage ? (
+                    <HomePage nextPage={pages[1].path} />
+                ) : (
+                    <JournalBody isSpread={isSpread}>
+                        <Routes>
+                            {pages.filter(p => p.path !== '/').map((page) => {
+                                const currentIndex = pages.findIndex(p => p.path === page.path);
+                                const nextPageIndex = (currentIndex + 1) % pages.length;
+                                const prevPageIndex = (currentIndex - 1 + pages.length) % pages.length;
+                                return (
+                                    <Route
+                                        key={page.path}
+                                        path={page.path}
+                                        element={
+                                            <page.component
+                                                nextPage={pages[nextPageIndex].path}
+                                                prevPage={pages[prevPageIndex].path}
+                                                pageNumber={page.pageNumber}
+                                                isBookmark={page.isBookmark}
+                                                isSpread={isSpread}
+                                                pages={page.path === '/table-of-contents' ? pages : undefined}
+                                            />
+                                        }
                                     />
-                                }
-                            />
-                        );
-                    })}
-                </Routes>
-            </JournalBody>
-        )}
+                                );
+                            })}
+                        </Routes>
+                    </JournalBody>
+                )}
 
-        <JournalBookmark pages={pages} />
-        
-        {nextPage && (
-             <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '.1%' }}>
-                 <ArrowForwardIos />
-             </DesktopNavArrow>
-        )}
-      </JournalContainer>
-    </ThemeProvider>
-  );
+                <JournalBookmark pages={pages} />
+
+                {nextPage && (
+                    <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '.1%' }}>
+                        <ArrowForwardIos />
+                    </DesktopNavArrow>
+                )}
+            </JournalContainer>
+        </ThemeProvider>
+    );
 };
 
 export default Journal;

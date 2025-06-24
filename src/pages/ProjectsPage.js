@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import JournalPage from '../components/JournalPage/JournalPage';
 import SEO from '../components/SEO/SEO';
 import MineSweeperEscape from '../components/MineSweeperEscape/MineSweeperEscape';
-import { useMediaQuery, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import WritingText from '../components/WritingText/WritingText';
 import TypingText from '../components/TypingText/TypingText';
 
 const PageSpreadContainer = styled('div')({
-  display: 'flex',
-  width: '100%',
-  height: '100%',
-  boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
 });
 
 const DrawnToggleWrapper = styled(Box)(({ theme }) => ({
@@ -61,16 +61,15 @@ const RightPageContainer = styled(Box, {
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
-    marginTop: isDesktop ?  theme.spacing(4) : theme.spacing(1),
+    marginTop: isDesktop ? theme.spacing(4) : theme.spacing(1),
 }));
 
-const ProjectsPage = ({ pageNumber }) => {
+const ProjectsPage = ({ pageNumber, isSpread }) => {
     const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
     const [textEffect, setTextEffect] = useState('typing');
 
     const projectDescriptionMessage = "Welcome to my projects page; currently still adding to this page; In the meantime how about you play my game Minesweeper Escape!. Your avatar is stuck in mine sweeper and you have to get to the crown (with WSAD) to get out! Be careful some hidden tiles contain bombs, the numbers are hints that show you how many bombs there are around that tile. Theres always a solution here so do your best to get out!";
-    
+
     const DrawnToggle = (
         <DrawnToggleWrapper onClick={() => setTextEffect(prev => prev === 'typing' ? 'writing' : 'typing')}>
             <StyledSVG textEffect={textEffect}>
@@ -100,9 +99,9 @@ const ProjectsPage = ({ pageNumber }) => {
             )}
         </>
     );
-    
+
     const RightPageContent = (
-        <RightPageContainer isDesktop={isDesktop}>
+        <RightPageContainer isDesktop={isSpread}>
             <MineSweeperEscape />
         </RightPageContainer>
     );
@@ -115,7 +114,7 @@ const ProjectsPage = ({ pageNumber }) => {
                 name="Arsen Aldea"
                 type="article"
             />
-            {isDesktop ? (
+            {isSpread ? (
                 <PageSpreadContainer>
                     <JournalPage title="Projects" side="left" pageNumber={pageNumber}>
                         {LeftPageContent}
@@ -125,12 +124,10 @@ const ProjectsPage = ({ pageNumber }) => {
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (
-              <PageSpreadContainer>
                 <JournalPage title="Projects" side="right" pageNumber={pageNumber}>
                     {LeftPageContent}
                     {RightPageContent}
-                  </JournalPage>
-                </PageSpreadContainer>
+                </JournalPage>
             )}
         </>
     );

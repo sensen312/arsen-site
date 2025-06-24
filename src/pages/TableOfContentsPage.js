@@ -1,14 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import JournalPage from '../components/JournalPage/JournalPage';
-import { styled, useTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 const PageSpreadContainer = styled('div')({
-  display: 'flex',
-  width: '100%',
-  height: '100%',
-  boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
 });
 
 const ContentContainer = styled('div')(({theme}) => ({
@@ -38,14 +37,11 @@ const Leader = styled('span')({
     marginLeft: '0.5em',
 });
 
-const TableOfContentsPage = ({ pages, pageNumber }) => {
-    const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
-    
+const TableOfContentsPage = ({ pages, pageNumber, isSpread }) => {
     const tocContent = (
         <ContentContainer>
             {pages && pages
-                .filter((page) => page.isBookmark && page.path !== '/') // Don't show the cover in ToC
+                .filter((page) => page.isBookmark && page.path !== '/')
                 .map((page, index) => (
                     <ClickableLineItem key={index} to={page.path}>
                         <TitleSpan>{page.title}</TitleSpan>
@@ -58,7 +54,7 @@ const TableOfContentsPage = ({ pages, pageNumber }) => {
 
     return (
         <>
-        {isDesktop ? (
+        {isSpread ? (
             <PageSpreadContainer>
                 <JournalPage title="Table of Contents" side="left" pageNumber={pageNumber}>
                     {tocContent}

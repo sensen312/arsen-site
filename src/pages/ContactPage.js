@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import JournalPage from '../components/JournalPage/JournalPage';
-import { styled, useTheme } from '@mui/material/styles';
-import { Button, Typography, useMediaQuery } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { Button, Typography } from '@mui/material';
 import SEO from '../components/SEO/SEO';
 
 const PageSpreadContainer = styled('div')({
-  display: 'flex',
-  width: '100%',
-  height: '100%',
-  boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
 });
 
 const FormContainer = styled('form')(({ theme }) => ({
@@ -54,9 +54,8 @@ const StyledInput = styled('input')(({ theme }) => ({
 }));
 
 const TextareaWrapper = styled('div')({
-    position: 'relative', 
+    position: 'relative',
 });
-
 
 const StyledTextarea = styled('textarea')(({ theme }) => ({
     fontFamily: theme.fonts.body,
@@ -69,7 +68,7 @@ const StyledTextarea = styled('textarea')(({ theme }) => ({
     resize: 'none',
     padding: 0,
     boxSizing: 'border-box',
-    overflow: 'hidden', 
+    overflow: 'hidden',
     '&:focus': {
         outline: 'none',
     },
@@ -90,17 +89,12 @@ const SubmitButton = styled(Button)(({ theme, disabled }) => ({
     },
     fontWeight: 'bold',
     cursor: disabled ? 'not-allowed' : 'pointer',
-   
 }));
 
-
-const ContactPage = ({ pageNumber }) => {
-    const theme = useTheme();
-    const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+const ContactPage = ({ pageNumber, isSpread }) => {
     const form = useRef();
     const [statusMessage, setStatusMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     const textareaRef = useRef(null);
     const [messageValue, setMessageValue] = useState('');
 
@@ -109,7 +103,7 @@ const ContactPage = ({ pageNumber }) => {
             textareaRef.current.style.height = 'auto';
             textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
-    }, [messageValue]); 
+    }, [messageValue]);
 
     const checkLastSubmission = () => {
         const lastSubmissionTime = sessionStorage.getItem('lastSubmissionTime');
@@ -134,7 +128,7 @@ const ContactPage = ({ pageNumber }) => {
             .then(() => {
                 setStatusMessage("Message sent successfully!");
                 form.current.reset();
-                setMessageValue(''); 
+                setMessageValue('');
                 sessionStorage.setItem('lastSubmissionTime', Date.now().toString());
                 setTimeout(() => setStatusMessage(""), 5000);
             }, (error) => {
@@ -145,7 +139,7 @@ const ContactPage = ({ pageNumber }) => {
                 setIsSubmitting(false);
             });
     };
-    
+
     const formContent = (
         <FormContainer ref={form} onSubmit={sendEmail}>
             <InputRow>
@@ -186,13 +180,13 @@ const ContactPage = ({ pageNumber }) => {
                 name="Arsen Aldea"
                 type="profile"
             />
-            {isDesktop ? (
+            {isSpread ? (
                 <PageSpreadContainer>
                     <JournalPage title="Contact" side="left" pageNumber={pageNumber}>
-                       {formContent}
+                        {formContent}
                     </JournalPage>
                     <JournalPage title="Notes" side="right" pageNumber={pageNumber ? pageNumber + 1 : null}>
-                       <p>HELLO THERE! USE THIS TO MESSAGE ME BUT KEEP IN MIND I ONLY GET A LIMITED AMOUNT OF MESSAGES A MONTH SO ;-; TY FOR VISITING MY SITE!</p>
+                        <p>HELLO THERE! USE THIS TO MESSAGE ME BUT KEEP IN MIND I ONLY GET A LIMITED AMOUNT OF MESSAGES A MONTH SO ;-; TY FOR VISITING MY SITE!</p>
                     </JournalPage>
                 </PageSpreadContainer>
             ) : (
