@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/arsen-site/static/css/main.471eb35d.css",
-    "main.js": "/arsen-site/static/js/main.add33746.js",
+    "main.js": "/arsen-site/static/js/main.322f6fa6.js",
     "static/js/453.114cb9f7.chunk.js": "/arsen-site/static/js/453.114cb9f7.chunk.js",
     "static/media/aboutPic.jpg": "/arsen-site/static/media/aboutPic.cbb0c934dc4f491f392a.jpg",
     "static/media/DancingScript-VariableFont_wght.ttf": "/arsen-site/static/media/DancingScript-VariableFont_wght.e6757278cd7ce626ed96.ttf",
     "index.html": "/arsen-site/index.html",
     "main.471eb35d.css.map": "/arsen-site/static/css/main.471eb35d.css.map",
-    "main.add33746.js.map": "/arsen-site/static/js/main.add33746.js.map",
+    "main.322f6fa6.js.map": "/arsen-site/static/js/main.322f6fa6.js.map",
     "453.114cb9f7.chunk.js.map": "/arsen-site/static/js/453.114cb9f7.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.471eb35d.css",
-    "static/js/main.add33746.js"
+    "static/js/main.322f6fa6.js"
   ]
 }
