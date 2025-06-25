@@ -159,6 +159,14 @@ const JournalBookmark = ({ pages, containerRef, activePath }) => {
 
     const bookmarkedPages = pages.filter((page) => page.isBookmark);
 
+    const renderMobileBookmarkText = (title) => {
+        if (title.length >= 10) {
+            return title.substring(0, 8) + '...';
+        }
+        return title;
+    };
+
+
     const DesktopBookmarks = (
         <>
             <DesktopBookmarkContainer style={{ zIndex: 1 }}>
@@ -223,13 +231,13 @@ const JournalBookmark = ({ pages, containerRef, activePath }) => {
                                 bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
                                 isActive={false}
                             >
-                                <MobileBookmarkText>{page.title}</MobileBookmarkText>
+                                <MobileBookmarkText>{renderMobileBookmarkText(page.title)}</MobileBookmarkText>
                             </StyledMobileBookmark>
                         </StyledLink>
                     );
                 })}
             </MobileBookmarkContainer>
-            
+
             <MobileBookmarkContainer style={{ zIndex: 3 }}>
                  {bookmarkedPages.map((page, index) => {
                     const isActive = page.path === activePath;
@@ -244,12 +252,13 @@ const JournalBookmark = ({ pages, containerRef, activePath }) => {
                                 bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
                                 isActive={true}
                             >
-                                <MobileBookmarkText>{page.title}</MobileBookmarkText>
+                                <MobileBookmarkText>{renderMobileBookmarkText(page.title)}</MobileBookmarkText>
                             </StyledMobileBookmark>
                         </StyledLink>
                     );
                 })}
             </MobileBookmarkContainer>
+
         </>
     );
 
