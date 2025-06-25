@@ -1,7 +1,11 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+
+const StyledLink = styled(Link)({
+    textDecoration: 'none',
+});
 
 const DesktopBookmarkContainer = styled('div')(({ theme }) => ({
     position: 'absolute',
@@ -43,6 +47,17 @@ const StyledDesktopBookmark = styled('div', {
     },
 }));
 
+const DesktopBookmarkText = styled(Typography)(({ theme }) => ({
+    color: '#f0f0f0',
+    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+    fontWeight: 'bold',
+    fontFamily: theme.fonts.heading,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    fontSize: 'clamp(0.75rem, 1.5vh, 0.95rem)',
+    
+}));
 
 const MobileBookmarkContainer = styled('div')(({ theme }) => ({
     position: 'absolute',
@@ -50,34 +65,56 @@ const MobileBookmarkContainer = styled('div')(({ theme }) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     zIndex: 1, 
+
     gap: '0.5em',
     pointerEvents: 'none',
     bottom: '100%',
+    marginTop:'40px',
+    '@media (min-width: 1024px)': {
+        display: 'none',
+    }
 }));
-
 
 const StyledMobileBookmark = styled('div', {
   shouldForwardProp: (prop) => prop !== 'bookmarkColor',
 })(({ theme, bookmarkColor }) => ({
-  backgroundColor: bookmarkColor,
-  boxShadow: '2px -2px 6px rgba(0, 0, 0, 0.35)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  position: 'relative',
-  width: '4vh',
-  minWidth: '35px',
-  height: '10vh',
-  minHeight: '70px',
-  clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 50% 25%, 0% 0%)',
-  transition: 'transform 0.2s ease-in-out, filter 0.2s ease-in-out',
-  pointerEvents: 'auto',
-  cursor: 'pointer',
-  overflow: 'hidden',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    filter: 'brightness(1.15)',
-  },
+    backgroundColor: bookmarkColor,
+    boxShadow: '2px -2px 6px rgba(0, 0, 0, 0.35)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'left',
+    position: 'relative',
+    width: '4vh',
+    minWidth: '35px',
+    height: '100%',
+    paddingBottom: '13px',
+    marginTop: '10px',
+    clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 50% 25%, 0% 0%)',
+    transition: 'transform 0.2s ease-in-out, filter 0.2s ease-in-out',
+    pointerEvents: 'auto',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    '&:hover': {
+        transform: 'translateY(-8px)',
+        filter: 'brightness(1.15)',
+    },
+}));
+
+const MobileBookmarkText = styled(Typography)(({ theme }) => ({
+    color: '#f0f0f0',
+    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+    fontWeight: 'bold',
+    fontFamily: theme.fonts.heading,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    maxHeight: '100%',
+    fontSize: 'clamp(0.75rem, 1.5vh, 0.95rem)',
+    writingMode: 'vertical-rl',
+    textOrientation: 'mixed',
+    transform: 'rotate(180deg)',
+
+    
 }));
 
 const JournalBookmark = ({ pages }) => {
@@ -96,63 +133,37 @@ const JournalBookmark = ({ pages }) => {
         <>
             <DesktopBookmarkContainer>
                 {bookmarkedPages.map((page, index) => (
-                    <Link
+                    <StyledLink
                         key={`desktop-${index}`}
                         to={page.path}
-                        style={{ textDecoration: 'none' }}
                         aria-label={`Go to ${page.title} page`}
                     >
                         <StyledDesktopBookmark
                             bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
                         >
-                            <Typography
-                                sx={(theme) => ({
-                                    color: '#f0f0f0',
-                                    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                                    fontWeight: 'bold',
-                                    fontFamily: theme.fonts.heading,
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontSize: 'clamp(0.75rem, 1.5vh, 0.95rem)',
-                                })}
-                            >
+                            <DesktopBookmarkText>
                                 {page.title}
-                            </Typography>
+                            </DesktopBookmarkText>
                         </StyledDesktopBookmark>
-                    </Link>
+                    </StyledLink>
                 ))}
             </DesktopBookmarkContainer>
 
             <MobileBookmarkContainer>
                  {bookmarkedPages.map((page, index) => (
-                    <Link
+                    <StyledLink
                         key={`mobile-${index}`}
                         to={page.path}
-                        style={{ textDecoration: 'none' }}
                         aria-label={`Go to ${page.title} page`}
                     >
                         <StyledMobileBookmark
                              bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
                         >
-                             <Typography
-                                sx={(theme) => ({
-                                    color: '#f0f0f0',
-                                    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                                    fontWeight: 'bold',
-                                    fontFamily: theme.fonts.heading,
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    fontSize: 'clamp(0.75rem, 1.5vh, 0.95rem)',
-                                    writingMode: 'vertical-rl',
-                                    textOrientation: 'mixed',
-                                    transform: 'rotate(180deg)',
-                                })}
-                            >
+                             <MobileBookmarkText>
                                {page.title}
-                            </Typography>
+                            </MobileBookmarkText>
                         </StyledMobileBookmark>
-                    </Link>
+                    </StyledLink>
                 ))}
             </MobileBookmarkContainer>
         </>

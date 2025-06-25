@@ -26,8 +26,7 @@ const JournalBody = styled('div', {
 })(({ theme, isSpread }) => ({
     position: 'relative',
     width: isSpread ? '144vh' : '72vh',
-    height: '100%',
-    width: '100%',
+    height: '90vh',
     maxWidth: '95vw',
     maxHeight: 'calc(95vw * 1.25)',
     display: 'flex',
