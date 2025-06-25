@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
@@ -18,14 +18,11 @@ const DesktopBookmarkContainer = styled('div')(({ theme }) => ({
     zIndex: 1,
     gap: '0.5em',
     pointerEvents: 'none',
-    '@media (max-width: 1023px)': {
-        display: 'none',
-    }
 }));
 
 const StyledDesktopBookmark = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'bookmarkColor',
-})(({ theme, bookmarkColor }) => ({
+    shouldForwardProp: (prop) => prop !== 'bookmarkColor' && prop !== 'isActive',
+})(({ theme, bookmarkColor, isActive }) => ({
     backgroundColor: bookmarkColor,
     boxShadow: '2px 3px 6px rgba(0, 0, 0, 0.35)',
     padding: '0 2.5em 0 1.2em',
@@ -37,9 +34,10 @@ const StyledDesktopBookmark = styled('div', {
     height: '4vh',
     minHeight: '30px',
     clipPath: 'polygon(0% 0%, 100% 0%, 85% 50%, 100% 100%, 0% 100%)',
-    transition: 'transform 0.2s ease-in-out, filter 0.2s ease-in-out',
+    transition: 'transform 0.2s ease-in-out, filter 0.2s ease-in-out, z-index 0s',
     pointerEvents: 'auto',
     cursor: 'pointer',
+    zIndex: isActive ? 2 : 1,
     '&:hover': {
         transform: 'translateX(10px)',
         filter: 'brightness(1.15)',
@@ -69,14 +67,11 @@ const MobileBookmarkContainer = styled('div')(({ theme }) => ({
     pointerEvents: 'none',
     bottom: '100%',
     marginTop:'20px',
-    '@media (min-width: 1024px)': {
-        display: 'none',
-    }
 }));
 
 const StyledMobileBookmark = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'bookmarkColor',
-})(({ theme, bookmarkColor }) => ({
+    shouldForwardProp: (prop) => prop !== 'bookmarkColor' && prop !== 'isActive',
+})(({ theme, bookmarkColor, isActive }) => ({
     backgroundColor: bookmarkColor,
     boxShadow: '2px -2px 6px rgba(0, 0, 0, 0.35)',
     display: 'flex',
@@ -89,13 +84,15 @@ const StyledMobileBookmark = styled('div', {
     minHeight: '90px',
     marginBottom:'-10px',
     clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 50% 25%, 0% 0%)',
-    transition: 'transform 0.2s ease-in-out, filter 0.2s ease-in-out',
+    transition: 'transform 0.2s ease-in-out, filter 0.2s ease-in-out, z-index 0s',
     pointerEvents: 'auto',
     cursor: 'pointer',
     overflow: 'hidden',
+    zIndex: isActive ? 3 : 1,
     '&:hover': {
         transform: 'translateY(-8px)',
         filter: 'brightness(1.15)',
+        zIndex: 3,
     },
 }));
 
@@ -116,7 +113,35 @@ const MobileBookmarkText = styled(Typography)(({ theme }) => ({
     transform: 'rotate(180deg)',
 }));
 
-const JournalBookmark = ({ pages }) => {
+const JournalBookmark = ({ pages, containerRef, activePath }) => {
+    const [bookmarkPosition, setBookmarkPosition] = useState('right');
+
+    useLayoutEffect(() => {
+        const calculatePosition = () => {
+            if (containerRef.current) {
+                const journalRect = containerRef.current.getBoundingClientRect();
+                const spaceOnRight = window.innerWidth - journalRect.right;
+                const spaceOnTop = journalRect.top;
+
+                setBookmarkPosition(spaceOnRight > spaceOnTop ? 'right' : 'top');
+            }
+        };
+
+        let debounceTimeout;
+        const handleResize = () => {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(calculatePosition, 150);
+        };
+
+        window.addEventListener('resize', handleResize);
+        calculatePosition();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            clearTimeout(debounceTimeout);
+        };
+    }, [containerRef]);
+
     const bookmarkColors = [
         '#b55d4f',
         '#4b7a8c',
@@ -128,10 +153,11 @@ const JournalBookmark = ({ pages }) => {
 
     const bookmarkedPages = pages.filter((page) => page.isBookmark);
 
-    return (
-        <>
-            <DesktopBookmarkContainer>
-                {bookmarkedPages.map((page, index) => (
+    const DesktopBookmarks = (
+        <DesktopBookmarkContainer>
+            {bookmarkedPages.map((page, index) => {
+                const isActive = page.path === activePath;
+                return (
                     <StyledLink
                         key={`desktop-${index}`}
                         to={page.path}
@@ -139,34 +165,43 @@ const JournalBookmark = ({ pages }) => {
                     >
                         <StyledDesktopBookmark
                             bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
+                            isActive={isActive}
                         >
                             <DesktopBookmarkText>
                                 {page.title}
                             </DesktopBookmarkText>
                         </StyledDesktopBookmark>
                     </StyledLink>
-                ))}
-            </DesktopBookmarkContainer>
+                );
+            })}
+        </DesktopBookmarkContainer>
+    );
 
-            <MobileBookmarkContainer>
-                 {bookmarkedPages.map((page, index) => (
+    const MobileBookmarks = (
+        <MobileBookmarkContainer>
+            {bookmarkedPages.map((page, index) => {
+                const isActive = page.path === activePath;
+                return (
                     <StyledLink
                         key={`mobile-${index}`}
                         to={page.path}
                         aria-label={`Go to ${page.title} page`}
                     >
                         <StyledMobileBookmark
-                             bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
+                            bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
+                            isActive={isActive}
                         >
-                             <MobileBookmarkText>
+                            <MobileBookmarkText>
                                 {page.title}
                             </MobileBookmarkText>
                         </StyledMobileBookmark>
                     </StyledLink>
-                ))}
-            </MobileBookmarkContainer>
-        </>
+                );
+            })}
+        </MobileBookmarkContainer>
     );
+
+    return bookmarkPosition === 'right' ? DesktopBookmarks : MobileBookmarks;
 };
 
 export default JournalBookmark;

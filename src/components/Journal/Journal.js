@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from '../../pages/HomePage';
 import AboutPage from '../../pages/AboutPage';
@@ -12,6 +12,7 @@ import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import JournalBookmark from '../JournalBookmark/JournalBookmark';
 import { classicVellumTheme } from '../../styles/theme';
 import GlobalStyles from '../../styles/GlobalStyles';
+
 
 const JournalContainer = styled('div')({
     position: 'relative',
@@ -53,6 +54,7 @@ const Journal = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [isSpread, setIsSpread] = useState(false);
+    const journalContainerRef = useRef(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -101,8 +103,8 @@ const Journal = () => {
     return (
         <ThemeProvider theme={classicVellumTheme}>
             <GlobalStyles />
-            <JournalContainer>
-              <JournalBookmark pages={pages} />
+            <JournalContainer ref={journalContainerRef}>
+                <JournalBookmark pages={pages} containerRef={journalContainerRef} activePath={location.pathname} />
 
                 {prevPage && (
                     <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '.1%' }}>
