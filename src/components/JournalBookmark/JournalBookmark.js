@@ -38,7 +38,7 @@ const StyledDesktopBookmark = styled('div', {
     cursor: 'pointer',
     zIndex: isActive ? 2 : 1,
     '&:hover': {
-        transform: isActive ? 'none' : 'translateX(10px)', // Conditional transform
+        transform: isActive ? 'none' : 'translateX(10px)', 
         filter: 'brightness(1.15)',
         zIndex: 3,
     },
