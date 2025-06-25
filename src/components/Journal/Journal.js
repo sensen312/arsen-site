@@ -19,7 +19,6 @@ const JournalContainer = styled('div')({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100vh'
 });
 
 const JournalBody = styled('div', {
@@ -27,7 +26,8 @@ const JournalBody = styled('div', {
 })(({ theme, isSpread }) => ({
     position: 'relative',
     width: isSpread ? '144vh' : '72vh',
-    height: '90vh',
+    height: '100%',
+    width: '100%',
     maxWidth: '95vw',
     maxHeight: 'calc(95vw * 1.25)',
     display: 'flex',
@@ -103,6 +103,8 @@ const Journal = () => {
         <ThemeProvider theme={classicVellumTheme}>
             <GlobalStyles />
             <JournalContainer>
+              <JournalBookmark pages={pages} />
+
                 {prevPage && (
                     <DesktopNavArrow onClick={() => navigate(prevPage)} style={{ left: '.1%' }}>
                         <ArrowBackIosNew />
@@ -139,8 +141,7 @@ const Journal = () => {
                     </JournalBody>
                 )}
 
-                <JournalBookmark pages={pages} />
-
+                
                 {nextPage && (
                     <DesktopNavArrow onClick={() => navigate(nextPage)} style={{ right: '.1%' }}>
                         <ArrowForwardIos />
