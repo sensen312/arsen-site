@@ -73,7 +73,7 @@ const StyledMobileBookmark = styled('div', {
     boxShadow: '2px -2px 6px rgba(0, 0, 0, 0.35)',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'left',
+    alignItems: 'left', // lol
     position: 'relative',
     width: '4vh',
     minWidth: '35px',
@@ -94,21 +94,25 @@ const StyledMobileBookmark = styled('div', {
 }));
 
 const MobileBookmarkText = styled(Typography)(({ theme }) => ({
+    display: 'block',
+    height: '100%',
+    boxSizing: 'border-box',
+    padding: '1em 0.2em', 
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    
+    writingMode: 'vertical-rl',
+    textOrientation: 'mixed',
+    transform: 'rotate(180deg)',
+
     color: '#f0f0f0',
     textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
     fontWeight: 'bold',
     fontFamily: theme.fonts.heading,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    maxHeight: '100%',
-    padding: '1em 0',
-    boxSizing: 'border-box',
     fontSize: 'clamp(0.75rem, 1.5vh, 0.95rem)',
-    writingMode: 'vertical-rl',
-    textOrientation: 'mixed',
-    transform: 'rotate(180deg)',
 }));
+
 
 const JournalBookmark = ({ pages, containerRef, activePath }) => {
     const [bookmarkPosition, setBookmarkPosition] = useState('right');
