@@ -114,7 +114,13 @@ const JournalBookmark = ({ pages, containerRef, activePath }) => {
     const [bookmarkPosition, setBookmarkPosition] = useState('right');
 
     useLayoutEffect(() => {
-        const calculatePosition = () => {
+         const calculatePosition = () => {
+            const isMobileView = window.innerWidth < 796;
+            if (isMobileView) {
+                setBookmarkPosition('top');
+                return; 
+            }
+
             if (containerRef.current) {
                 const journalRect = containerRef.current.getBoundingClientRect();
                 const spaceOnRight = window.innerWidth - journalRect.right;
@@ -123,7 +129,6 @@ const JournalBookmark = ({ pages, containerRef, activePath }) => {
                 setBookmarkPosition(spaceOnRight > spaceOnTop ? 'right' : 'top');
             }
         };
-
         let debounceTimeout;
         const handleResize = () => {
             clearTimeout(debounceTimeout);
