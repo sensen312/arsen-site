@@ -65,11 +65,10 @@ const MobileBookmarkContainer = styled('div')(({ theme }) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     zIndex: 1, 
-
     gap: '0.5em',
     pointerEvents: 'none',
     bottom: '100%',
-    marginTop:'40px',
+    marginTop:'20px',
     '@media (min-width: 1024px)': {
         display: 'none',
     }
@@ -86,9 +85,9 @@ const StyledMobileBookmark = styled('div', {
     position: 'relative',
     width: '4vh',
     minWidth: '35px',
-    height: '100%',
-    paddingBottom: '13px',
-    marginTop: '10px',
+    height: '12vh',
+    minHeight: '90px',
+    marginBottom:'-10px',
     clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 50% 25%, 0% 0%)',
     transition: 'transform 0.2s ease-in-out, filter 0.2s ease-in-out',
     pointerEvents: 'auto',
@@ -109,12 +108,12 @@ const MobileBookmarkText = styled(Typography)(({ theme }) => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     maxHeight: '100%',
+    padding: '1em 0',
+    boxSizing: 'border-box',
     fontSize: 'clamp(0.75rem, 1.5vh, 0.95rem)',
     writingMode: 'vertical-rl',
     textOrientation: 'mixed',
     transform: 'rotate(180deg)',
-
-    
 }));
 
 const JournalBookmark = ({ pages }) => {
@@ -160,7 +159,7 @@ const JournalBookmark = ({ pages }) => {
                              bookmarkColor={bookmarkColors[index % bookmarkColors.length]}
                         >
                              <MobileBookmarkText>
-                               {page.title}
+                                {page.title}
                             </MobileBookmarkText>
                         </StyledMobileBookmark>
                     </StyledLink>
