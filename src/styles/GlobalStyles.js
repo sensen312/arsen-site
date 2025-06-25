@@ -15,6 +15,8 @@ const GlobalStyles = () => (
         minHeight: '100vh',
         fontFamily: theme.fonts.body,
         boxSizing: 'border-box',
+        overflowX: 'hidden', 
+        overflowY: 'hidden', 
       },
       '*, *::before, *::after': {
         boxSizing: 'border-box',
