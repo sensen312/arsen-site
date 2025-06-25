@@ -97,18 +97,20 @@ const JournalPage = ({ title, children, pageNumber, side }) => {
             }
         };
 
-        const element = pageBodyRef.current;
-        if (!element) return;
+        const scrollContainer = pageBodyRef.current;
+        const contentElement = scrollContainer ? scrollContainer.firstElementChild : null;
+
+        if (!scrollContainer || !contentElement) return;
 
         const observer = new ResizeObserver(checkScroll);
-        observer.observe(element);
-        element.addEventListener('scroll', checkScroll);
+        observer.observe(contentElement);
+        scrollContainer.addEventListener('scroll', checkScroll);
         
-        checkScroll(); 
+        checkScroll();
 
         return () => {
-            observer.unobserve(element);
-            element.removeEventListener('scroll', checkScroll);
+            observer.unobserve(contentElement);
+            scrollContainer.removeEventListener('scroll', checkScroll);
         };
     }, [children]);
 

@@ -49,8 +49,7 @@ const SkillsCategory = styled('div')(({ theme }) => ({
 }));
 
 const SkillsLabel = styled('strong')(({ theme }) => ({
-    fontFamily: theme.fonts.heading,
-    minWidth: '110px',
+    fontWeight: 'bold',
     flexShrink: 0,
 }));
 
@@ -159,7 +158,6 @@ const ResumePage = ({ pageNumber, isSpread }) => {
             ) : (
                 <JournalPage title="Resume" side="right" pageNumber={pageNumber}>
                     {educationAndExperienceContent}
-                    <hr style={{margin: `${theme.page.lineHeight} 0`}}/>
                     {projectsAndSkillsContent}
                 </JournalPage>
             )}

@@ -217,9 +217,20 @@ const MineSweeperEscape = () => {
     const [timer, setTimer] = useState(0);
     const [leaderboard, setLeaderboard] = useState([]);
     const [explodingCell, setExplodingCell] = useState(null);
+    const [playerIcon, setPlayerIcon] = useState('😊');
     
     const clickTimeout = useRef(null);
     
+    useEffect(() => {
+        if (explodingCell) {
+            setPlayerIcon('😮');
+        } else if (lives === 1) {
+            setPlayerIcon('🤕');
+        } else {
+            setPlayerIcon('😊');
+        }
+    }, [lives, explodingCell]);
+
     const startGame = useCallback((diff) => {
         const currentDifficulty = diff || difficulty;
         const settings = difficultySettings[currentDifficulty];
@@ -229,6 +240,7 @@ const MineSweeperEscape = () => {
         setLives(settings.lives);
         setExplodingCell(null);
         setIsFlaggingMode(false);
+        setPlayerIcon('😊');
 
         let startPos, endPos, solutionPath;
         const minDistance = 3;
@@ -465,10 +477,10 @@ const MineSweeperEscape = () => {
             mainContent = '👑';
         } else if (isRevealed) {
             styleType = 'path';
-            mainContent = adjacentBombs > 0 ? adjacentBombs : '';
+            mainContent = adjacentBombs;
         } else {
             styleType = 'hidden';
-            if (isAdjacentToPath && adjacentBombs > 0) {
+            if (isAdjacentToPath) {
                 mainContent = adjacentBombs;
             }
             if (isFlagged) {
@@ -505,7 +517,7 @@ const MineSweeperEscape = () => {
                     top: `${playerPosition.y * 30 + 5}px`, 
                     left: `${playerPosition.x * 30 + 5}px`,
                 }}>
-                    😊
+                    {playerIcon}
                 </PlayerIcon>
             </GridWrapper>
         );
