@@ -6,14 +6,14 @@ import fontWriting from '../../assets/fonts/DancingScript-VariableFont_wght.ttf'
 import './writingText.css';
 
 const WritingContainer = styled('div')(({ theme }) => ({
-  fontFamily: theme.fonts.body,
-  color: theme.colors.ink,
-  lineHeight: theme.page.lineHeight,
-  fontSize: theme.page.fontSize,
-  background: 'transparent',
-  border: 'none',
-  boxShadow: 'none',
-  position: 'relative', 
+    fontFamily: theme.fonts.body,
+    color: theme.colors.ink,
+    lineHeight: theme.page.lineHeight,
+    fontSize: theme.page.fontSize,
+    background: 'transparent',
+    border: 'none',
+    boxShadow: 'none',
+    position: 'relative',
 }));
 
 const TextWrapper = styled('div')({
@@ -37,174 +37,200 @@ const SVGOverlay = styled('div')({
 });
 
 const QuillCursor = styled(motion.span)({
-  position: 'absolute',
-  top: -20,
-  left: 23,
-  zIndex: 10,
-  pointerEvents: 'none',
-  originX: '0',
-  originY: '100%',
-  rotate: -15,
+    position: 'absolute',
+    top: -20,
+    left: 23,
+    zIndex: 10,
+    pointerEvents: 'none',
+    originX: '0',
+    originY: '100%',
+    rotate: -15,
 });
 
-const WritingText = ({ message, onFinish, repeat = false }) => {
-  const theme = useTheme();
-  const [font, setFont] = useState(null);
-  const [pathData, setPathData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const placeholderRef = useRef(null);
-  const textControls = useAnimation();
-  const quillControls = useAnimation();
+const WritingText = ({ message, onFinish, repeat = false, fastForward = false }) => {
+    const theme = useTheme();
+    const [font, setFont] = useState(null);
+    const [pathData, setPathData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [animationState, setAnimationState] = useState('IDLE');
+    const [runId, setRunId] = useState(0);
+    
+    const placeholderRef = useRef(null);
+    const textControls = useAnimation();
+    const quillControls = useAnimation();
 
-  const onFinishRef = useRef(onFinish);
-  const repeatRef = useRef(repeat);
+    const onFinishRef = useRef(onFinish);
+    const repeatRef = useRef(repeat);
+    const fastForwardRef = useRef(fastForward);
+    const previousRepeat = useRef(repeat);
 
-  useEffect(() => {
-    onFinishRef.current = onFinish;
-    repeatRef.current = repeat;
-  }, [onFinish, repeat]);
+    useEffect(() => {
+        onFinishRef.current = onFinish;
+        repeatRef.current = repeat;
+        fastForwardRef.current = fastForward;
+    }, [onFinish, repeat, fastForward]);
 
-  useEffect(() => {
-    const loadFont = async () => {
-      try {
-        const loadedFont = await opentype.load(fontWriting);
-        setFont(loadedFont);
-      } catch (error) {
-        console.error("Font could not be loaded:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadFont();
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!font || !message || !placeholderRef.current) return;
-
-    const placeholder = placeholderRef.current;
-    const baseFontSize = parseFloat(window.getComputedStyle(placeholder).fontSize);
-    const scriptFontSize = baseFontSize; 
-    const baselineOffset = (font.ascender / font.unitsPerEm) * scriptFontSize;
-
-    const generatedPaths = [];
-    let x = 0;
-    let y = baselineOffset;
-
-    const pixelLineHeight = parseFloat(window.getComputedStyle(placeholder).lineHeight);
-    const containerWidth = placeholder.clientWidth;
-
-    const words = message.split(' ');
-    words.forEach(word => {
-      const wordWithSpace = word + ' ';
-      const wordWidth = font.getAdvanceWidth(wordWithSpace, scriptFontSize);
-
-      if (x + wordWidth > containerWidth && x > 0) {
-        x = 0;
-        y += pixelLineHeight;
-      }
-
-      for (let i = 0; i < wordWithSpace.length; i++) {
-        const char = wordWithSpace[i];
-        if (char === ' ') {
-          x += font.getAdvanceWidth(' ', scriptFontSize);
-          continue;
+    useEffect(() => {
+        if (repeat && !previousRepeat.current && animationState === 'FINISHED') {
+            setRunId(id => id + 1);
         }
-        const path = font.getPath(char, x, y, scriptFontSize);
-        generatedPaths.push({ d: path.toPathData(2) });
-        const advanceWidth = font.getAdvanceWidth(char, scriptFontSize);
-        const kerning = (i < word.length) ? font.getKerningValue(char, wordWithSpace[i + 1]) : 0;
-        x += advanceWidth + (kerning || 0);
-      }
-    });
+        previousRepeat.current = repeat;
+    }, [repeat, animationState]);
 
-    setPathData(generatedPaths);
-  }, [font, message, isLoading, theme]);
+    useEffect(() => {
+        const loadFont = async () => {
+            try {
+                const loadedFont = await opentype.load(fontWriting);
+                setFont(loadedFont);
+            } catch (error) {
+                console.error("Font could not be loaded:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadFont();
+    }, []);
 
-  useEffect(() => {
-    if (pathData.length === 0 || isLoading) return;
-    let isCancelled = false;
+    useLayoutEffect(() => {
+        if (!font || !message || !placeholderRef.current) return;
 
-    const animateWriting = async () => {
-      while (!isCancelled) {
-        await textControls.set({ pathLength: 0, fill: "transparent", opacity: 1 });
-        quillControls.set({ opacity: 0 });
-        await quillControls.start({ opacity: 1, transition: { duration: 0.5 } });
+        const placeholder = placeholderRef.current;
+        const baseFontSize = parseFloat(window.getComputedStyle(placeholder).fontSize);
+        const scriptFontSize = baseFontSize;
+        const baselineOffset = (font.ascender / font.unitsPerEm) * scriptFontSize;
 
-        for (let i = 0; i < pathData.length; i++) {
-          if (isCancelled) break;
-          const pathElement = document.getElementById(`path-${i}`);
-          if (!pathElement) continue;
+        const generatedPaths = [];
+        let x = 0;
+        let y = baselineOffset;
 
-          const pathLength = pathElement.getTotalLength();
-          const duration = Math.max(0.04, pathLength / 5000);
+        const pixelLineHeight = parseFloat(window.getComputedStyle(placeholder).lineHeight);
+        const containerWidth = placeholder.clientWidth;
 
-          quillControls.set({ offsetPath: `path("${pathData[i].d}")`, offsetRotate: "0deg" });
+        const words = message.split(' ');
+        words.forEach(word => {
+            const wordWithSpace = word + ' ';
+            const wordWidth = font.getAdvanceWidth(wordWithSpace, scriptFontSize);
 
-          const textAnimation = textControls.start(custom =>
-            custom === i ? {
-                pathLength: 1,
-                fill: theme.colors.ink,
-                transition: { pathLength: { duration, ease: 'linear' }, fill: { duration: 0.1, delay: duration } }
-            } : {}
-          );
-          const quillAnimation = quillControls.start({
-            offsetDistance: "100%",
-            transition: { duration, ease: 'linear' },
-          });
-          await Promise.all([textAnimation, quillAnimation]);
-        }
-        if (isCancelled) break;
-        await quillControls.start({ opacity: 0, transition: { duration: 0.5, delay: 0.5 } });
+            if (x + wordWidth > containerWidth && x > 0) {
+                x = 0;
+                y += pixelLineHeight;
+            }
 
-        if (repeatRef.current) {
-          await new Promise(resolve => setTimeout(resolve, 3000));
-        } else {
-          if (onFinishRef.current) onFinishRef.current();
-          break;
-        }
-      }
-    };
+            for (let i = 0; i < wordWithSpace.length; i++) {
+                const char = wordWithSpace[i];
+                if (char === ' ') {
+                    x += font.getAdvanceWidth(' ', scriptFontSize);
+                    continue;
+                }
+                const path = font.getPath(char, x, y, scriptFontSize);
+                generatedPaths.push({ d: path.toPathData(2) });
+                const advanceWidth = font.getAdvanceWidth(char, scriptFontSize);
+                const kerning = (i < word.length) ? font.getKerningValue(char, wordWithSpace[i + 1]) : 0;
+                x += advanceWidth + (kerning || 0);
+            }
+        });
 
-    const timeoutId = setTimeout(animateWriting, 100);
-    return () => {
-      isCancelled = true;
-      clearTimeout(timeoutId);
-    };
-  }, [pathData, isLoading, textControls, quillControls, theme.colors.ink]);
+        setPathData(generatedPaths);
+        setRunId(id => id + 1); 
+    }, [font, message, isLoading, theme]);
+
+    useEffect(() => {
+        if (pathData.length === 0 || isLoading || runId === 0) return;
+        let isCancelled = false;
+        
+        const getSpeedMultiplier = () => fastForwardRef.current ? 5 : .7;
+
+        const animateWriting = async () => {
+            setAnimationState('WRITING');
+            await textControls.set({ pathLength: 0, fill: "transparent", opacity: 1 });
+            
+            quillControls.set({ opacity: 0 });
+            await quillControls.start({ opacity: 1, transition: { duration: 0.5 } });
+
+            for (let i = 0; i < pathData.length; i++) {
+                if (isCancelled) return;
+                const pathElement = document.getElementById(`path-${i}`);
+                if (!pathElement) continue;
+
+                const speedMultiplier = getSpeedMultiplier();
+                const pathLength = pathElement.getTotalLength();
+                const duration = Math.max(0.04, pathLength / 5000) / speedMultiplier;
+
+                quillControls.set({ offsetPath: `path("${pathData[i].d}")`, offsetRotate: "0deg" });
+
+                const textAnimation = textControls.start(custom =>
+                    custom === i ? {
+                        pathLength: 1,
+                        fill: theme.colors.ink,
+                        transition: { pathLength: { duration, ease: 'linear' }, fill: { duration: 0.1, delay: duration } }
+                    } : {}
+                );
+                const quillAnimation = quillControls.start({
+                    offsetDistance: "100%",
+                    transition: { duration, ease: 'linear' },
+                });
+                await Promise.all([textAnimation, quillAnimation]);
+            }
+            
+            if (isCancelled) return;
+            
+            await quillControls.start({ opacity: 0, transition: { duration: 0.5, delay: 0.5 } });
+
+            if (repeatRef.current) {
+                setAnimationState('PAUSED');
+                const speedMultiplier = getSpeedMultiplier();
+                await new Promise(resolve => setTimeout(resolve, 3000 / speedMultiplier));
+                if (!isCancelled) {
+                    setRunId(id => id + 1);
+                }
+            } else {
+                if (onFinishRef.current) onFinishRef.current();
+                setAnimationState('FINISHED');
+            }
+        };
+
+        animateWriting();
+        
+        return () => {
+            isCancelled = true;
+            textControls.stop();
+            quillControls.stop();
+        };
+    }, [pathData, isLoading, textControls, quillControls, theme.colors.ink, runId]);
 
 
-  return (
-    <WritingContainer>
-      <TextWrapper>
-        <InvisiblePlaceholder ref={placeholderRef}>
-          {message}
-        </InvisiblePlaceholder>
-        <SVGOverlay>
-          {!isLoading && pathData.length > 0 && (
-            <svg width="100%" height="100%" style={{ overflow: 'visible' }}>
-              <g>
-                {pathData.map((p, index) => (
-                  <motion.path
-                    key={index}
-                    id={`path-${index}`}
-                    d={p.d}
-                    stroke={theme.colors.ink}
-                    strokeWidth=".6"
-                    custom={index}
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={textControls}
-                  />
-                ))}
-              </g>
-            </svg>
-          )}
-        </SVGOverlay>
-      </TextWrapper>
-      <QuillCursor className="quill-cursor" animate={quillControls}>
-        🪶
-      </QuillCursor>
-    </WritingContainer>
-  );
+    return (
+        <WritingContainer>
+            <TextWrapper>
+                <InvisiblePlaceholder ref={placeholderRef}>
+                    {message}
+                </InvisiblePlaceholder>
+                <SVGOverlay>
+                    {!isLoading && pathData.length > 0 && (
+                        <svg width="100%" height="100%" style={{ overflow: 'visible' }}>
+                            <g>
+                                {pathData.map((p, index) => (
+                                    <motion.path
+                                        key={`${runId}-${index}`}
+                                        id={`path-${index}`}
+                                        d={p.d}
+                                        stroke={theme.colors.ink}
+                                        strokeWidth=".6"
+                                        custom={index}
+                                        initial={{ pathLength: 0, opacity: 0 }}
+                                        animate={textControls}
+                                    />
+                                ))}
+                            </g>
+                        </svg>
+                    )}
+                </SVGOverlay>
+            </TextWrapper>
+            <QuillCursor className="quill-cursor" animate={quillControls}>
+                🪶
+            </QuillCursor>
+        </WritingContainer>
+    );
 };
 
 export default WritingText;

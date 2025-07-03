@@ -14,18 +14,25 @@ const PageSpreadContainer = styled('div')({
     boxShadow: '0 15px 40px rgba(0,0,0,0.4)',
 });
 
-const DrawnToggleWrapper = styled(Box)(({ theme }) => ({
-    height: theme.page.lineHeight,
+const ControlsContainer = styled(Box)(({ theme }) => ({
+    minHeight: theme.page.lineHeight,
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingBottom: `calc(${theme.page.lineHeight})`,
+}));
+
+const DrawnToggleWrapper = styled(Box)({
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
     userSelect: 'none',
-}));
+});
 
-const StyledSVG = styled('svg', {
-    shouldForwardProp: (prop) => prop !== 'textEffect',
-})(({ theme, textEffect }) => ({
-    height: `calc(${theme.page.lineHeight} )`,
+const StyledSVG = styled('svg')(({ theme }) => ({
+    height: `calc(${theme.page.lineHeight})`,
     width: 'auto',
     overflow: 'visible',
     '& .label': {
@@ -49,9 +56,42 @@ const StyledSVG = styled('svg', {
         fill: theme.colors.ink,
         transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
         transformOrigin: 'center center',
-        transform: textEffect === 'typing' ? 'translateX(0px)' : 'translateX(20px)',
     }
 }));
+
+const FastForwardWrapper = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    flexBasis: '100%', 
+}));
+
+const FastForwardLabel = styled('span')(({ theme }) => ({
+    fontFamily: theme.fonts.body,
+    color: theme.colors.ink,
+    marginRight: theme.spacing(1),
+}));
+
+const FastForwardButton = styled('button')(({ theme, active }) => ({
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    height: `calc(${theme.page.lineHeight} * 1.3)`,
+    '& svg': {
+        height: '100%',
+        width: 'auto',
+        '& path': {
+            stroke: active ? theme.colors.ink : '#aaa',
+            strokeWidth: '2',
+            fill: 'none',
+            filter: 'url(#hand-drawn-filter)',
+            transition: 'stroke 0.4s ease',
+        }
+    }
+}));
+
 
 const RightPageContainer = styled(Box, {
     shouldForwardProp: (prop) => prop !== 'isDesktop',
@@ -67,35 +107,60 @@ const RightPageContainer = styled(Box, {
 const ProjectsPage = ({ pageNumber, isSpread }) => {
     const theme = useTheme();
     const [textEffect, setTextEffect] = useState('typing');
+    const [fastForward, setFastForward] = useState(false);
+    const [repeatAnimation, setRepeatAnimation] = useState(false);
 
     const projectDescriptionMessage = "Welcome to my projects page; currently still adding to this page; In the meantime how about you play my game Minesweeper Escape!. Your avatar is stuck in mine sweeper and you have to get to the crown (with WSAD) to get out! Be careful some hidden tiles contain bombs, the numbers are hints that show you how many bombs there are around that tile. Theres always a solution here so do your best to get out!";
 
-    const DrawnToggle = (
-        <DrawnToggleWrapper onClick={() => setTextEffect(prev => prev === 'typing' ? 'writing' : 'typing')}>
-            <StyledSVG textEffect={textEffect}>
+    const DrawnToggle = ({ onToggle, isChecked, leftLabel, rightLabel, type = "text" }) => (
+        <DrawnToggleWrapper onClick={onToggle}>
+            <StyledSVG>
                 <defs>
                     <filter id="hand-drawn-filter">
                         <feTurbulence type="fractalNoise" baseFrequency="0.1 0.1" numOctaves="1" result="turbulence" />
                         <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1.2" xChannelSelector="R" yChannelSelector="G" />
                     </filter>
                 </defs>
-                <text x="0" y="15" className="label typing-label" fill={textEffect === 'typing' ? theme.colors.ink : '#aaa'}>Typing</text>
+                <text x="0" y="15" className={`label ${type === 'text' ? 'typing-label' : ''}`} fill={!isChecked ? theme.colors.ink : '#aaa'}>{leftLabel}</text>
                 <g transform="translate(80, 0)">
                     <path className="track" d="M2,10 a8,8 0 0,1 8,-8 H30 a8,8 0 0,1 8,8 v0 a8,8 0 0,1 -8,8 H10 a8,8 0 0,1 -8,-8 z" />
-                    <circle className="knob" cx="10" cy="10" r="6" />
+                    <circle className="knob" cx="10" cy="10" r="6" style={{ transform: !isChecked ? 'translateX(0px)' : 'translateX(20px)' }} />
                 </g>
-                <text x="135" y="15" className="label writing-label" fill={textEffect === 'writing' ? theme.colors.ink : '#aaa'}>Writing</text>
+                <text x="135" y="15" className={`label ${type === 'text' ? 'writing-label' : ''}`} fill={isChecked ? theme.colors.ink : '#aaa'}>{rightLabel}</text>
             </StyledSVG>
         </DrawnToggleWrapper>
     );
 
     const LeftPageContent = (
         <>
-            {DrawnToggle}
+            <ControlsContainer>
+                <DrawnToggle
+                    onToggle={() => setTextEffect(prev => prev === 'typing' ? 'writing' : 'typing')}
+                    isChecked={textEffect === 'writing'}
+                    leftLabel="Typing"
+                    rightLabel="Writing"
+                    type="text"
+                />
+                <DrawnToggle
+                    onToggle={() => setRepeatAnimation(r => !r)}
+                    isChecked={repeatAnimation}
+                    leftLabel="Repeat Off"
+                    rightLabel="Repeat On"
+                />
+                <FastForwardWrapper>
+                    <FastForwardLabel>Fast Forward:</FastForwardLabel>
+                    <FastForwardButton active={fastForward} onClick={() => setFastForward(ff => !ff)} aria-label="Fast Forward Animation">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
+                        </svg>
+                    </FastForwardButton>
+                </FastForwardWrapper>
+            </ControlsContainer>
+
             {textEffect === 'typing' ? (
-                <TypingText message={projectDescriptionMessage} repeat={false} />
+                <TypingText message={projectDescriptionMessage} repeat={repeatAnimation} fastForward={fastForward} />
             ) : (
-                <WritingText message={projectDescriptionMessage} repeat={false} />
+                <WritingText message={projectDescriptionMessage} repeat={repeatAnimation} fastForward={fastForward} />
             )}
         </>
     );

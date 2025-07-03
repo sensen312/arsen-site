@@ -33,16 +33,25 @@ const MobilePolaroidImage = styled('img')(({ theme }) => ({
     transform: 'rotate(-3deg)',
 }));
 
-const DrawnToggleWrapper = styled(Box)(({ theme }) => ({
-    height: theme.page.lineHeight,
+const ControlsContainer = styled(Box)(({ theme }) => ({
+    minHeight: theme.page.lineHeight,
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingBottom: `calc(${theme.page.lineHeight})`,
+}));
+
+const DrawnToggleWrapper = styled(Box)({
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
     userSelect: 'none',
-}));
+});
 
 const StyledSVG = styled('svg')(({ theme }) => ({
-    height: `calc(${theme.page.lineHeight} )`,
+    height: `calc(${theme.page.lineHeight})`,
     width: 'auto',
     overflow: 'visible',
     '& .label': {
@@ -69,14 +78,50 @@ const StyledSVG = styled('svg')(({ theme }) => ({
     }
 }));
 
+const FastForwardWrapper = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    flexBasis: '100%', 
+}));
+
+const FastForwardLabel = styled('span')(({ theme }) => ({
+    fontFamily: theme.fonts.body,
+    color: theme.colors.ink,
+    marginRight: theme.spacing(1),
+}));
+
+const FastForwardButton = styled('button')(({ theme, active }) => ({
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    height: `calc(${theme.page.lineHeight} * 1.3)`,
+    '& svg': {
+        height: '100%',
+        width: 'auto',
+        '& path': {
+            stroke: active ? theme.colors.ink : '#aaa',
+            strokeWidth: '2',
+            fill: 'none',
+            filter: 'url(#hand-drawn-filter)',
+            transition: 'stroke 0.4s ease',
+        }
+    }
+}));
+
+
 const AboutPage = ({ pageNumber, isSpread }) => {
     const theme = useTheme();
     const [textEffect, setTextEffect] = useState('typing');
+    const [fastForward, setFastForward] = useState(false);
+    const [repeatAnimation, setRepeatAnimation] = useState(false);
 
     const aboutMeMessage = "Greetings! My name is Arsen Aldea. I am a recent Computer Science Graduate from the University of Florida. I have around 2 years of full stack internship experience under my belt, working at both FLVS and PerfectServe. My internships have allowed me to refine my skills in various programming languages, front-end technologies, and back-end systems, all while teaching me important skills in team work and communication.";
 
-    const DrawnToggle = (
-        <DrawnToggleWrapper onClick={() => setTextEffect(prev => prev === 'typing' ? 'writing' : 'typing')}>
+    const DrawnToggle = ({ onToggle, isChecked, leftLabel, rightLabel, type = "text" }) => (
+        <DrawnToggleWrapper onClick={onToggle}>
             <StyledSVG>
                 <defs>
                     <filter id="hand-drawn-filter">
@@ -84,23 +129,46 @@ const AboutPage = ({ pageNumber, isSpread }) => {
                         <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1.2" xChannelSelector="R" yChannelSelector="G" />
                     </filter>
                 </defs>
-                <text x="0" y="15" className="label typing-label" fill={textEffect === 'typing' ? theme.colors.ink : '#aaa'}>Typing</text>
+                <text x="0" y="15" className={`label ${type === 'text' ? 'typing-label' : ''}`} fill={!isChecked ? theme.colors.ink : '#aaa'}>{leftLabel}</text>
                 <g transform="translate(80, 0)">
                     <path className="track" d="M2,10 a8,8 0 0,1 8,-8 H30 a8,8 0 0,1 8,8 v0 a8,8 0 0,1 -8,8 H10 a8,8 0 0,1 -8,-8 z" />
-                    <circle className="knob" cx="10" cy="10" r="6" style={{ transform: textEffect === 'typing' ? 'translateX(0px)' : 'translateX(20px)' }}/>
+                    <circle className="knob" cx="10" cy="10" r="6" style={{ transform: !isChecked ? 'translateX(0px)' : 'translateX(20px)' }} />
                 </g>
-                <text x="135" y="15" className="label writing-label" fill={textEffect === 'writing' ? theme.colors.ink : '#aaa'}>Writing</text>
+                <text x="135" y="15" className={`label ${type === 'text' ? 'writing-label' : ''}`} fill={isChecked ? theme.colors.ink : '#aaa'}>{rightLabel}</text>
             </StyledSVG>
         </DrawnToggleWrapper>
     );
 
     const PageContent = (
         <>
-            {DrawnToggle}
+            <ControlsContainer>
+                <DrawnToggle
+                    onToggle={() => setTextEffect(prev => prev === 'typing' ? 'writing' : 'typing')}
+                    isChecked={textEffect === 'writing'}
+                    leftLabel="Typing"
+                    rightLabel="Writing"
+                    type="text"
+                />
+                <DrawnToggle
+                    onToggle={() => setRepeatAnimation(r => !r)}
+                    isChecked={repeatAnimation}
+                    leftLabel="Repeat Off"
+                    rightLabel="Repeat On"
+                />
+                <FastForwardWrapper>
+                    <FastForwardLabel>Fast Forward:</FastForwardLabel>
+                    <FastForwardButton active={fastForward} onClick={() => setFastForward(ff => !ff)} aria-label="Fast Forward Animation">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
+                        </svg>
+                    </FastForwardButton>
+                </FastForwardWrapper>
+            </ControlsContainer>
+
             {textEffect === 'typing' ? (
-                <TypingText message={aboutMeMessage} repeat={true} />
+                <TypingText message={aboutMeMessage} repeat={repeatAnimation} fastForward={fastForward} />
             ) : (
-                <WritingText message={aboutMeMessage} repeat={true} />
+                <WritingText message={aboutMeMessage} repeat={repeatAnimation} fastForward={fastForward} />
             )}
         </>
     );
